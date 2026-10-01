@@ -2507,38 +2507,30 @@ let picFreqChartInstance = null;
 
 // Ganti Sub-tab Workflow
 window.saveWorkflowEntry = async function () {
-    const date = document.getElementById('wfDate')?.value || new Date().toISOString().split('T')[0];
-    const status = document.getElementById('wfStatus')?.value || 'Selesai';
-    const pic = document.getElementById('wfPic')?.value.trim() || '';
-    const videos = parseInt(document.getElementById('wfVideoCount')?.value) || 0;
-    const photos = parseInt(document.getElementById('wfPhotoCount')?.value) || 0;
-    const activity = document.getElementById('wfActivity')?.value.trim() || '';
-    const notes = document.getElementById('wfNotes')?.value.trim() || '';
+    // 1. Ambil nilai dari input DULU sebelum di-reset
+    // Cek kemungkinan ID: wfDate atau date picker
+    const dateInput = document.getElementById('wfDate') || document.querySelector('input[type="date"]');
+    const statusInput = document.getElementById('wfStatus') || document.querySelector('select');
+    const picInput = document.getElementById('wfPic') || document.getElementById('wfEditor') || document.getElementById('picName');
+    const videoInput = document.getElementById('wfVideoCount') || document.getElementById('wfVideo');
+    const photoInput = document.getElementById('wfPhotoCount') || document.getElementById('wfPhoto');
+    const activityInput = document.getElementById('wfActivity') || document.getElementById('wfTask');
+    const notesInput = document.getElementById('wfNotes') || document.getElementById('wfDesc');
 
-    if (!date || !pic || !activity) {
-        alert('Harap isi Tanggal, Nama PIC, dan Aktivitas Pekerjaan!');
+    const date = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+    const status = statusInput ? statusInput.value : 'Selesai';
+    const pic = picInput ? picInput.value.trim() : '';
+    const activity = activityInput ? activityInput.value.trim() : '';
+    const notes = notesInput ? notesInput.value.trim() : '';
+    const videos = videoInput ? (parseInt(videoInput.value) || 0) : 0;
+    const photos = photoInput ? (parseInt(photoInput.value) || 0) : 0;
+
+    if (!activity) {
+        alert('Harap isi Judul / Aktivitas Utama!');
         return;
     }
 
-    const newLog = {
-        id: 'wf-' + Date.now(),
-        date,
-        pic,
-        status,
-        videos,
-        photos,
-        activity,
-        notes
-    };
-
-    // 1. Simpan ke tampilan lokal browser
-    if (typeof appData !== 'undefined') {
-        if (!appData.workflowLogs) appData.workflowLogs = [];
-        appData.workflowLogs.unshift(newLog);
-        localStorage.setItem('sid_app_data', JSON.stringify(appData));
-    }
-
-    // 2. Kirim langsung ke backend Railway -> Google Sheets
+    // 2. Kirim data yang sudah ditampung ke backend Railway -> Google Sheets
     try {
         await fetch('/api/save-data', {
             method: 'POST',
@@ -2546,20 +2538,49 @@ window.saveWorkflowEntry = async function () {
             body: JSON.stringify({
                 sheetName: 'Daily_Workflow',
                 headers: ["Tanggal", "PIC", "Aktivitas", "Status", "Jumlah Video", "Jumlah Foto", "Keterangan"],
-                values: [date, pic, activity, status, videos, photos, notes]
+                values: [
+                    date,
+                    pic || "IMAM",
+                    activity,
+                    status,
+                    videos,
+                    photos,
+                    notes
+                ]
             })
         });
     } catch (err) {
-        console.error('Gagal kirim ke backend:', err);
+        console.error('Gagal kirim ke Google Sheets:', err);
     }
 
-    // 3. Reset Input Form
-    document.getElementById('wfActivity').value = '';
-    document.getElementById('wfNotes').value = '';
-    document.getElementById('wfVideoCount').value = '';
-    document.getElementById('wfPhotoCount').value = '';
+    // 3. Masukkan ke riwayat tampilan lokal
+    const newLog = {
+        id: 'wf-' + Date.now(),
+        date: date,
+        pic: pic || "IMAM",
+        status: status,
+        videos: videos,
+        photos: photos,
+        activity: activity,
+        notes: notes
+    };
 
-    renderWorkflowTable();
+    if (typeof appData !== 'undefined') {
+        if (!appData.workflowLogs) appData.workflowLogs = [];
+        appData.workflowLogs.unshift(newLog);
+        localStorage.setItem('sid_app_data', JSON.stringify(appData));
+    }
+
+    // 4. BARU RESET FORM SETELAH DATA TERKIRIM
+    if (activityInput) activityInput.value = '';
+    if (notesInput) notesInput.value = '';
+    if (videoInput) videoInput.value = '0';
+    if (photoInput) photoInput.value = '0';
+
+    if (typeof renderWorkflowTable === 'function') {
+        renderWorkflowTable();
+    }
+
     alert('Log harian berhasil disimpan!');
 };
 
