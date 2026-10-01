@@ -2506,89 +2506,61 @@ let picOutputChartInstance = null;
 let picFreqChartInstance = null;
 
 // Ganti Sub-tab Workflow
-window.switchWorkflowTab = function(tab) {
-  const tabInput = document.getElementById('workflowTabInput');
-  const tabAnalytics = document.getElementById('workflowTabAnalytics');
-  const btnInput = document.getElementById('btnTabWfInput');
-  const btnAnalytics = document.getElementById('btnTabWfAnalytics');
+window.saveWorkflowEntry = async function () {
+    const date = document.getElementById('wfDate')?.value || new Date().toISOString().split('T')[0];
+    const status = document.getElementById('wfStatus')?.value || 'Selesai';
+    const pic = document.getElementById('wfPic')?.value.trim() || '';
+    const videos = parseInt(document.getElementById('wfVideoCount')?.value) || 0;
+    const photos = parseInt(document.getElementById('wfPhotoCount')?.value) || 0;
+    const activity = document.getElementById('wfActivity')?.value.trim() || '';
+    const notes = document.getElementById('wfNotes')?.value.trim() || '';
 
-  if (!tabInput || !tabAnalytics) return;
-
-  if (tab === 'input') {
-    tabInput.classList.remove('hidden');
-    tabAnalytics.classList.add('hidden');
-    if (btnInput) {
-      btnInput.classList.add('bg-white', 'text-calm-800', 'shadow-sm');
-      btnInput.classList.remove('text-calm-500');
+    if (!date || !pic || !activity) {
+        alert('Harap isi Tanggal, Nama PIC, dan Aktivitas Pekerjaan!');
+        return;
     }
-    if (btnAnalytics) {
-      btnAnalytics.classList.remove('bg-white', 'text-calm-800', 'shadow-sm');
-      btnAnalytics.classList.add('text-calm-500');
+
+    const newLog = {
+        id: 'wf-' + Date.now(),
+        date,
+        pic,
+        status,
+        videos,
+        photos,
+        activity,
+        notes
+    };
+
+    // 1. Simpan ke tampilan lokal browser
+    if (typeof appData !== 'undefined') {
+        if (!appData.workflowLogs) appData.workflowLogs = [];
+        appData.workflowLogs.unshift(newLog);
+        localStorage.setItem('sid_app_data', JSON.stringify(appData));
     }
-  } else {
-    tabInput.classList.add('hidden');
-    tabAnalytics.classList.remove('hidden');
-    if (btnAnalytics) {
-      btnAnalytics.classList.add('bg-white', 'text-calm-800', 'shadow-sm');
-      btnAnalytics.classList.remove('text-calm-500');
+
+    // 2. Kirim langsung ke backend Railway -> Google Sheets
+    try {
+        await fetch('/api/save-data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sheetName: 'Daily_Workflow',
+                headers: ["Tanggal", "PIC", "Aktivitas", "Status", "Jumlah Video", "Jumlah Foto", "Keterangan"],
+                values: [date, pic, activity, status, videos, photos, notes]
+            })
+        });
+    } catch (err) {
+        console.error('Gagal kirim ke backend:', err);
     }
-    if (btnInput) {
-      btnInput.classList.remove('bg-white', 'text-calm-800', 'shadow-sm');
-      btnInput.classList.add('text-calm-500');
-    }
-    renderPICAnalytics();
-  }
-};
 
-// Simpan Log Workflow Harian
-window.saveWorkflowEntry = function() {
-  const date = document.getElementById('wfDate')?.value;
-  const status = document.getElementById('wfStatus')?.value || 'Selesai';
-  const pic = document.getElementById('wfPIC')?.value.trim();
-  const videos = parseInt(document.getElementById('wfVideoCount')?.value) || 0;
-  const photos = parseInt(document.getElementById('wfPhotoCount')?.value) || 0;
-  const activity = document.getElementById('wfActivity')?.value.trim();
-  const notes = document.getElementById('wfNotes')?.value.trim();
+    // 3. Reset Input Form
+    document.getElementById('wfActivity').value = '';
+    document.getElementById('wfNotes').value = '';
+    document.getElementById('wfVideoCount').value = '';
+    document.getElementById('wfPhotoCount').value = '';
 
-  if (!date || !pic || !activity) {
-    alert('Harap isi Tanggal, Nama PIC, dan Aktivitas Pekerjaan!');
-    return;
-  }
-
-  const newLog = {
-    id: 'wf-' + Date.now(),
-    date,
-    pic,
-    status,
-    videos,
-    photos,
-    activity,
-    notes
-  };
-
-  if (typeof appData !== 'undefined') {
-    if (!appData.workflowLogs) appData.workflowLogs = [];
-    appData.workflowLogs.unshift(newLog);
-    localStorage.setItem('sid_app_data', JSON.stringify(appData));
-  }
-
-  // Kirim data ke Google Sheets jika integrasi proxy aktif
-  if (typeof window.sendToGoogleSheet === 'function') {
-    window.sendToGoogleSheet(
-      "Daily_Workflow",
-      ["Tanggal", "PIC", "Aktivitas", "Status", "Jumlah Video", "Jumlah Foto", "Keterangan"],
-      [date, pic, activity, status, videos, photos, notes]
-    );
-  }
-
-  // Reset Input Form
-  document.getElementById('wfActivity').value = '';
-  document.getElementById('wfNotes').value = '';
-  document.getElementById('wfVideoCount').value = '';
-  document.getElementById('wfPhotoCount').value = '';
-
-  renderWorkflowTable();
-  alert('Log harian berhasil disimpan!');
+    renderWorkflowTable();
+    alert('Log harian berhasil disimpan!');
 };
 
 // Render Tabel Riwayat Workflow
