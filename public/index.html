@@ -2507,62 +2507,64 @@ let picFreqChartInstance = null;
 
 // Ganti Sub-tab Workflow
 window.saveWorkflowEntry = async function () {
-    // 1. Ambil nilai dari input DULU sebelum di-reset
-    // Cek kemungkinan ID: wfDate atau date picker
-    const dateInput = document.getElementById('wfDate') || document.querySelector('input[type="date"]');
-    const statusInput = document.getElementById('wfStatus') || document.querySelector('select');
-    const picInput = document.getElementById('wfPic') || document.getElementById('wfEditor') || document.getElementById('picName');
-    const videoInput = document.getElementById('wfVideoCount') || document.getElementById('wfVideo');
-    const photoInput = document.getElementById('wfPhotoCount') || document.getElementById('wfPhoto');
-    const activityInput = document.getElementById('wfActivity') || document.getElementById('wfTask');
-    const notesInput = document.getElementById('wfNotes') || document.getElementById('wfDesc');
+    // 1. Tangkap seluruh nilai elemen form berdasarkan ID dan fallback atribut
+    const dateEl = document.getElementById('wfDate') || document.querySelector('#workflowTabInput input[type="date"]');
+    const statusEl = document.getElementById('wfStatus') || document.querySelector('#workflowTabInput select');
+    const picEl = document.getElementById('wfPic') || document.getElementById('wfEditor') || document.querySelector('#workflowTabInput input[placeholder*="PIC"], #workflowTabInput input[value="IMAM"]');
+    const videoEl = document.getElementById('wfVideoCount') || document.getElementById('wfVideos') || document.querySelectorAll('#workflowTabInput input[type="number"]')[0];
+    const photoEl = document.getElementById('wfPhotoCount') || document.getElementById('wfPhotos') || document.querySelectorAll('#workflowTabInput input[type="number"]')[1];
+    const activityEl = document.getElementById('wfActivity') || document.querySelector('#workflowTabInput input[placeholder*="Edit Video"], #workflowTabInput input[placeholder*="Aktivitas"]');
+    const notesEl = document.getElementById('wfNotes') || document.querySelector('#workflowTabInput textarea');
 
-    const date = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
-    const status = statusInput ? statusInput.value : 'Selesai';
-    const pic = picInput ? picInput.value.trim() : '';
-    const activity = activityInput ? activityInput.value.trim() : '';
-    const notes = notesInput ? notesInput.value.trim() : '';
-    const videos = videoInput ? (parseInt(videoInput.value) || 0) : 0;
-    const photos = photoInput ? (parseInt(photoInput.value) || 0) : 0;
+    const dateVal = dateEl && dateEl.value ? dateEl.value : new Date().toISOString().split('T')[0];
+    const statusVal = statusEl && statusEl.value ? statusEl.value : 'Selesai';
+    const picVal = picEl && picEl.value ? picEl.value.trim() : 'IMAM';
+    const activityVal = activityEl && activityEl.value ? activityEl.value.trim() : '';
+    const notesVal = notesEl && notesEl.value ? notesEl.value.trim() : '';
+    const videoVal = videoEl && videoEl.value !== '' ? parseInt(videoEl.value, 10) : 0;
+    const photoVal = photoEl && photoEl.value !== '' ? parseInt(photoEl.value, 10) : 0;
 
-    if (!activity) {
+    if (!activityVal) {
         alert('Harap isi Judul / Aktivitas Utama!');
         return;
     }
 
-    // 2. Kirim data yang sudah ditampung ke backend Railway -> Google Sheets
+    // 2. Susun payload lengkap
+    const payload = {
+        sheetName: 'Daily_Workflow',
+        headers: ["Tanggal", "PIC", "Aktivitas", "Status", "Jumlah Video", "Jumlah Foto", "Keterangan"],
+        values: [
+            dateVal,
+            picVal,
+            activityVal,
+            statusVal,
+            videoVal,
+            photoVal,
+            notesVal
+        ]
+    };
+
+    // 3. Kirim ke backend Railway -> Google Sheets
     try {
         await fetch('/api/save-data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                sheetName: 'Daily_Workflow',
-                headers: ["Tanggal", "PIC", "Aktivitas", "Status", "Jumlah Video", "Jumlah Foto", "Keterangan"],
-                values: [
-                    date,
-                    pic || "IMAM",
-                    activity,
-                    status,
-                    videos,
-                    photos,
-                    notes
-                ]
-            })
+            body: JSON.stringify(payload)
         });
     } catch (err) {
-        console.error('Gagal kirim ke Google Sheets:', err);
+        console.error('Gagal simpan:', err);
     }
 
-    // 3. Masukkan ke riwayat tampilan lokal
+    // 4. Update tabel riwayat lokal
     const newLog = {
         id: 'wf-' + Date.now(),
-        date: date,
-        pic: pic || "IMAM",
-        status: status,
-        videos: videos,
-        photos: photos,
-        activity: activity,
-        notes: notes
+        date: dateVal,
+        pic: picVal,
+        status: statusVal,
+        videos: videoVal,
+        photos: photoVal,
+        activity: activityVal,
+        notes: notesVal
     };
 
     if (typeof appData !== 'undefined') {
@@ -2571,11 +2573,11 @@ window.saveWorkflowEntry = async function () {
         localStorage.setItem('sid_app_data', JSON.stringify(appData));
     }
 
-    // 4. BARU RESET FORM SETELAH DATA TERKIRIM
-    if (activityInput) activityInput.value = '';
-    if (notesInput) notesInput.value = '';
-    if (videoInput) videoInput.value = '0';
-    if (photoInput) photoInput.value = '0';
+    // 5. Bersihkan form setelah pengiriman
+    if (activityEl) activityEl.value = '';
+    if (notesEl) notesEl.value = '';
+    if (videoEl) videoEl.value = '0';
+    if (photoEl) photoEl.value = '0';
 
     if (typeof renderWorkflowTable === 'function') {
         renderWorkflowTable();
