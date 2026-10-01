@@ -2507,64 +2507,95 @@ let picFreqChartInstance = null;
 
 // Ganti Sub-tab Workflow
 window.saveWorkflowEntry = async function () {
-    // 1. Tangkap seluruh nilai elemen form berdasarkan ID dan fallback atribut
-    const dateEl = document.getElementById('wfDate') || document.querySelector('#workflowTabInput input[type="date"]');
-    const statusEl = document.getElementById('wfStatus') || document.querySelector('#workflowTabInput select');
-    const picEl = document.getElementById('wfPic') || document.getElementById('wfEditor') || document.querySelector('#workflowTabInput input[placeholder*="PIC"], #workflowTabInput input[value="IMAM"]');
-    const videoEl = document.getElementById('wfVideoCount') || document.getElementById('wfVideos') || document.querySelectorAll('#workflowTabInput input[type="number"]')[0];
-    const photoEl = document.getElementById('wfPhotoCount') || document.getElementById('wfPhotos') || document.querySelectorAll('#workflowTabInput input[type="number"]')[1];
-    const activityEl = document.getElementById('wfActivity') || document.querySelector('#workflowTabInput input[placeholder*="Edit Video"], #workflowTabInput input[placeholder*="Aktivitas"]');
-    const notesEl = document.getElementById('wfNotes') || document.querySelector('#workflowTabInput textarea');
+    const container = document.getElementById('workflowTabInput') || document;
+    const allInputs = container.querySelectorAll('input');
+    const allSelects = container.querySelectorAll('select');
+    const allTextareas = container.querySelectorAll('textarea');
 
-    const dateVal = dateEl && dateEl.value ? dateEl.value : new Date().toISOString().split('T')[0];
-    const statusVal = statusEl && statusEl.value ? statusEl.value : 'Selesai';
-    const picVal = picEl && picEl.value ? picEl.value.trim() : 'IMAM';
-    const activityVal = activityEl && activityEl.value ? activityEl.value.trim() : '';
-    const notesVal = notesEl && notesEl.value ? notesEl.value.trim() : '';
-    const videoVal = videoEl && videoEl.value !== '' ? parseInt(videoEl.value, 10) : 0;
-    const photoVal = photoEl && photoEl.value !== '' ? parseInt(photoEl.value, 10) : 0;
+    let date = "";
+    let pic = "";
+    let activity = "";
+    let status = "Selesai";
+    let videos = 0;
+    let photos = 0;
+    let notes = "";
 
-    if (!activityVal) {
+    allInputs.forEach(input => {
+        if (input.type === 'date') date = input.value;
+    });
+    if (!date) date = new Date().toISOString().split('T')[0];
+
+    if (allSelects.length > 0) {
+        status = allSelects[0].value || "Selesai";
+    }
+
+    const picEl = document.getElementById('wfPic') || document.getElementById('wfPIC') || document.querySelector('input[placeholder*="PIC"]') || allInputs[1];
+    if (picEl) pic = picEl.value.trim();
+
+    const actEl = document.getElementById('wfActivity') || document.querySelector('input[placeholder*="Aktivitas"]') || document.querySelector('input[placeholder*="TikTok"]') || allInputs[4];
+    if (actEl) activity = actEl.value.trim();
+
+    const noteEl = document.getElementById('wfNotes') || (allTextareas.length > 0 ? allTextareas[0] : null);
+    if (noteEl) notes = noteEl.value.trim();
+
+    const numInputs = container.querySelectorAll('input[type="number"]');
+    if (numInputs.length >= 2) {
+        videos = parseInt(numInputs[0].value) || 0;
+        photos = parseInt(numInputs[1].value) || 0;
+    } else {
+        const vEl = document.getElementById('wfVideoCount') || document.getElementById('wfVideo');
+        const pEl = document.getElementById('wfPhotoCount') || document.getElementById('wfPhoto');
+        if (vEl) videos = parseInt(vEl.value) || 0;
+        if (pEl) photos = parseInt(pEl.value) || 0;
+    }
+
+    if (!activity) {
         alert('Harap isi Judul / Aktivitas Utama!');
         return;
     }
 
-    // 2. Susun payload lengkap
-    const payload = {
-        sheetName: 'Daily_Workflow',
-        headers: ["Tanggal", "PIC", "Aktivitas", "Status", "Jumlah Video", "Jumlah Foto", "Keterangan"],
-        values: [
-            dateVal,
-            picVal,
-            activityVal,
-            statusVal,
-            videoVal,
-            photoVal,
-            notesVal
-        ]
-    };
+    const rowValues = [
+        String(date),
+        String(pic || "IMAM"),
+        String(activity),
+        String(status),
+        Number(videos),
+        Number(photos),
+        String(notes)
+    ];
 
-    // 3. Kirim ke backend Railway -> Google Sheets
     try {
         await fetch('/api/save-data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                sheetName: 'Daily_Workflow',
+                headers: ["Tanggal", "PIC", "Aktivitas", "Status", "Jumlah Video", "Jumlah Foto", "Keterangan"],
+                values: rowValues,
+                data: {
+                    date: date,
+                    pic: pic || "IMAM",
+                    activity: activity,
+                    status: status,
+                    videoCount: videos,
+                    photoCount: photos,
+                    notes: notes
+                }
+            })
         });
     } catch (err) {
-        console.error('Gagal simpan:', err);
+        console.error("Gagal kirim data:", err);
     }
 
-    // 4. Update tabel riwayat lokal
     const newLog = {
         id: 'wf-' + Date.now(),
-        date: dateVal,
-        pic: picVal,
-        status: statusVal,
-        videos: videoVal,
-        photos: photoVal,
-        activity: activityVal,
-        notes: notesVal
+        date: date,
+        pic: pic || "IMAM",
+        status: status,
+        videos: videos,
+        photos: photos,
+        activity: activity,
+        notes: notes
     };
 
     if (typeof appData !== 'undefined') {
@@ -2573,11 +2604,12 @@ window.saveWorkflowEntry = async function () {
         localStorage.setItem('sid_app_data', JSON.stringify(appData));
     }
 
-    // 5. Bersihkan form setelah pengiriman
-    if (activityEl) activityEl.value = '';
-    if (notesEl) notesEl.value = '';
-    if (videoEl) videoEl.value = '0';
-    if (photoEl) photoEl.value = '0';
+    if (actEl) actEl.value = '';
+    if (noteEl) noteEl.value = '';
+    if (numInputs.length >= 2) {
+        numInputs[0].value = '0';
+        numInputs[1].value = '0';
+    }
 
     if (typeof renderWorkflowTable === 'function') {
         renderWorkflowTable();
