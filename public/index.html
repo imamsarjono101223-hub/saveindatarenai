@@ -844,14 +844,16 @@
                                 <input type="number" id="tuNominal" required placeholder="Cth: 1500000" class="w-full p-3 bg-white border border-calm-200 rounded-xl text-base font-bold focus:ring-2 focus:ring-calm-800 outline-none">
                             </div>
                             
-                            <div class="p-4 bg-rose-50 border border-rose-100 rounded-xl">
-                                <label class="block text-xs font-bold text-rose-700 mb-2 flex items-center gap-1">
-                                    <i data-lucide="image" class="w-3 h-3"></i> Bukti Top Up: <span class="ml-auto text-[9px] bg-rose-200 px-1.5 rounded text-rose-800">PNG/JPG</span>
-                                </label>
-                                <input type="file" id="tuFile" accept="image/*" class="w-full text-xs text-calm-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer">
-                                <p class="text-[10px] text-rose-500 mt-2 italic" id="tuFileName">Belum ada screenshot bukti dipilih.</p>
-                            </div>
-
+                            <div class="p-4 bg-red-50 border border-red-100 rounded-xl">
+    <label class="block text-xs font-bold text-red-700 mb-2 flex items-center justify-between">
+        <span class="flex items-center gap-1">
+            <i data-lucide="file-text" class="w-3 h-3"></i> Bukti Top Up (Invoice):
+        </span>
+        <span class="text-[9px] bg-red-200 px-1.5 rounded text-red-800 font-bold">PDF</span>
+    </label>
+    <input type="file" id="tuFile" accept="application/pdf" class="w-full text-xs text-calm-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700 cursor-pointer" onchange="const f = this.files[0]; document.getElementById('tuFileName').textContent = f ? f.name : 'Belum ada file PDF dipilih.';">
+    <p class="text-[10px] text-red-500 mt-2 italic" id="tuFileName">Belum ada file PDF dipilih.</p>
+</div>
                             <button type="submit" class="w-full bg-calm-900 hover:bg-calm-800 text-white font-bold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-md">
                                 <i data-lucide="save" class="w-4 h-4"></i> Simpan & Sinkron
                             </button>
@@ -1672,7 +1674,7 @@
             if(found) pageInput.value = found.account;
         };
 
-       window.handleSaveTopUp = async function(e) {
+     window.handleSaveTopUp = async function(e) {
     if (e && e.preventDefault) e.preventDefault();
 
     const fileInput = document.getElementById('tuFile');
@@ -1685,7 +1687,7 @@
     const picVal = document.getElementById('tuPic') ? document.getElementById('tuPic').value : '-';
     const pageVal = document.getElementById('tuPageName') ? document.getElementById('tuPageName').value.trim() : '-';
     
-    // Ambil nominal dan bersihkan tanda titik, koma, Rp
+    // Ambil nominal & bersihkan karakter non-angka
     const rawNominal = document.getElementById('tuNominal') ? document.getElementById('tuNominal').value : '0';
     const cleanNominal = parseInt(String(rawNominal).replace(/[^0-9]/g, '')) || 0;
 
@@ -1696,77 +1698,74 @@
         return;
     }
 
-    const saveEntry = async (base64Img = null) => {
-        const newEntry = {
-            id: 'tu-' + Date.now(),
-            date: dateVal,
-            platform: platformVal,
-            cs: csName,
-            pic: picVal,
-            pageName: pageVal,
-            nominal: cleanNominal,
-            image: base64Img,
-            fileName: fileName
-        };
+    const newEntry = {
+        id: 'tu-' + Date.now(),
+        date: dateVal,
+        platform: platformVal,
+        cs: csName,
+        pic: picVal,
+        pageName: pageVal,
+        nominal: cleanNominal,
+        fileName: fileName
+    };
 
-        // 1. Simpan ke Local Storage / AppData
-        if (typeof appData !== 'undefined' && appData.topup) {
+    // 1. Simpan ke Local Storage (Metadata saja, bebas error kuota)
+    try {
+        if (typeof appData !== 'undefined') {
+            if (!appData.topup) appData.topup = [];
             appData.topup.unshift(newEntry);
             localStorage.setItem('sid_app_data', JSON.stringify(appData));
         }
-
-        // 2. Kirim ke Server Vercel -> Google Apps Script
-        const headers = ["ID", "Tanggal", "Platform", "CS", "PIC", "Halaman", "Nominal", "File Name"];
-        const rowValues = [
-            String(newEntry.id),
-            String(newEntry.date),
-            String(newEntry.platform),
-            String(newEntry.cs),
-            String(newEntry.pic),
-            String(newEntry.pageName),
-            Number(newEntry.nominal),
-            String(newEntry.fileName)
-        ];
-
-        try {
-            await fetch('/api/save-data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    sheetName: 'TopUp_Invoice',
-                    headers: headers,
-                    values: rowValues,
-                    data: newEntry
-                })
-            });
-        } catch (err) {
-            console.error('Gagal kirim Top Up ke server:', err);
-        }
-
-        // 3. Reset form
-        const formEl = document.getElementById('topupForm');
-        if (formEl) formEl.reset();
-        
-        const dateEl = document.getElementById('tuDate');
-        if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
-
-        const fileLabel = document.getElementById('tuFileName');
-        if (fileLabel) fileLabel.textContent = 'Belum ada screenshot bukti dipilih.';
-
-        if (typeof renderTopUpFolders === 'function') renderTopUpFolders();
-        if (typeof updateDashboardStats === 'function') updateDashboardStats();
-        if (typeof showToast === 'function') showToast('Invoice Top Up Tersimpan!');
-    };
-
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => saveEntry(ev.target.result);
-        reader.readAsDataURL(file);
-    } else {
-        saveEntry(null);
+    } catch (storageErr) {
+        console.warn('LocalStorage error:', storageErr);
     }
-};
 
+    // 2. Kirim ke Server Vercel -> Google Sheets
+    const headers = ["ID", "Tanggal", "Platform", "CS", "PIC", "Halaman", "Nominal", "File PDF"];
+    const rowValues = [
+        String(newEntry.id),
+        String(newEntry.date),
+        String(newEntry.platform),
+        String(newEntry.cs),
+        String(newEntry.pic),
+        String(newEntry.pageName),
+        Number(newEntry.nominal),
+        String(newEntry.fileName)
+    ];
+
+    try {
+        const res = await fetch('/api/save-data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sheetName: 'TopUp_Invoice',
+                headers: headers,
+                values: rowValues,
+                data: newEntry
+            })
+        });
+
+        if (!res.ok) throw new Error('Status: ' + res.status);
+    } catch (err) {
+        console.error('Gagal kirim ke Google Sheets:', err);
+        alert('Gagal simpan ke Google Sheets: ' + err.message);
+        return;
+    }
+
+    // 3. Reset form
+    const formEl = document.getElementById('topupForm');
+    if (formEl) formEl.reset();
+    
+    const dateEl = document.getElementById('tuDate');
+    if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+
+    const fileLabel = document.getElementById('tuFileName');
+    if (fileLabel) fileLabel.textContent = 'Belum ada file PDF dipilih.';
+
+    if (typeof renderTopUpFolders === 'function') renderTopUpFolders();
+    if (typeof updateDashboardStats === 'function') updateDashboardStats();
+    alert('Invoice Top Up PDF Berhasil Disimpan!');
+};
         window.deleteTopUp = function(id) { if(confirm('Hapus transaksi ini?')) { appData.topup = appData.topup.filter(t => t.id !== id); renderTopUpFolders(); updateDashboardStats(); } };
         window.applyTuFilter = function() { renderTopUpFolders(); };
 
