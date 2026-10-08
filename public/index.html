@@ -1687,84 +1687,97 @@
     const picVal = document.getElementById('tuPic') ? document.getElementById('tuPic').value : '-';
     const pageVal = document.getElementById('tuPageName') ? document.getElementById('tuPageName').value.trim() : '-';
     
-    // Ambil nominal & bersihkan karakter non-angka
     const rawNominal = document.getElementById('tuNominal') ? document.getElementById('tuNominal').value : '0';
     const cleanNominal = parseInt(String(rawNominal).replace(/[^0-9]/g, '')) || 0;
-
-    const fileName = file ? file.name : '-';
 
     if (cleanNominal <= 0) {
         alert('Harap isi nominal top up dengan benar!');
         return;
     }
 
-    const newEntry = {
-        id: 'tu-' + Date.now(),
-        date: dateVal,
-        platform: platformVal,
-        cs: csName,
-        pic: picVal,
-        pageName: pageVal,
-        nominal: cleanNominal,
-        fileName: fileName
+    const processUpload = async (base64Content = null, originalName = null) => {
+        const payload = {
+            sheetName: 'TopUp_Invoice',
+            fileBase64: base64Content,
+            fileName: originalName,
+            data: {
+                date: dateVal,
+                platform: platformVal,
+                cs: csName,
+                pic: picVal,
+                pageName: pageVal,
+                nominal: cleanNominal
+            }
+        };
+
+        const btnSubmit = document.querySelector('#topupForm button[type="submit"]') || document.querySelector('#topupForm button');
+
+        try {
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerText = 'Mengunggah ke Drive...';
+            }
+
+            const res = await fetch('/api/save-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error('Status server: ' + res.status);
+
+            // Simpan metadata ke local storage
+            if (typeof appData !== 'undefined') {
+                if (!appData.topup) appData.topup = [];
+                appData.topup.unshift({
+                    id: 'tu-' + Date.now(),
+                    date: dateVal,
+                    platform: platformVal,
+                    cs: csName,
+                    pic: picVal,
+                    pageName: pageVal,
+                    nominal: cleanNominal,
+                    fileName: originalName || '-'
+                });
+                try {
+                    localStorage.setItem('sid_app_data', JSON.stringify(appData));
+                } catch(err) {}
+            }
+
+            // Reset form
+            const formEl = document.getElementById('topupForm');
+            if (formEl) formEl.reset();
+            
+            const dateEl = document.getElementById('tuDate');
+            if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+
+            const fileLabel = document.getElementById('tuFileName');
+            if (fileLabel) fileLabel.textContent = 'Belum ada file PDF dipilih.';
+
+            if (typeof renderTopUpFolders === 'function') renderTopUpFolders();
+            if (typeof updateDashboardStats === 'function') updateDashboardStats();
+            alert('Invoice berhasil diunggah ke Google Drive dan tersimpan di Spreadsheet!');
+        } catch (err) {
+            console.error(err);
+            alert('Gagal simpan invoice: ' + err.message);
+        } finally {
+            if (btnSubmit) {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Simpan & Sinkron';
+                if (window.lucide) lucide.createIcons();
+            }
+        }
     };
 
-    // 1. Simpan ke Local Storage (Metadata saja, bebas error kuota)
-    try {
-        if (typeof appData !== 'undefined') {
-            if (!appData.topup) appData.topup = [];
-            appData.topup.unshift(newEntry);
-            localStorage.setItem('sid_app_data', JSON.stringify(appData));
-        }
-    } catch (storageErr) {
-        console.warn('LocalStorage error:', storageErr);
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            processUpload(evt.target.result, file.name);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        processUpload(null, null);
     }
-
-    // 2. Kirim ke Server Vercel -> Google Sheets
-    const headers = ["ID", "Tanggal", "Platform", "CS", "PIC", "Halaman", "Nominal", "File PDF"];
-    const rowValues = [
-        String(newEntry.id),
-        String(newEntry.date),
-        String(newEntry.platform),
-        String(newEntry.cs),
-        String(newEntry.pic),
-        String(newEntry.pageName),
-        Number(newEntry.nominal),
-        String(newEntry.fileName)
-    ];
-
-    try {
-        const res = await fetch('/api/save-data', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                sheetName: 'TopUp_Invoice',
-                headers: headers,
-                values: rowValues,
-                data: newEntry
-            })
-        });
-
-        if (!res.ok) throw new Error('Status: ' + res.status);
-    } catch (err) {
-        console.error('Gagal kirim ke Google Sheets:', err);
-        alert('Gagal simpan ke Google Sheets: ' + err.message);
-        return;
-    }
-
-    // 3. Reset form
-    const formEl = document.getElementById('topupForm');
-    if (formEl) formEl.reset();
-    
-    const dateEl = document.getElementById('tuDate');
-    if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
-
-    const fileLabel = document.getElementById('tuFileName');
-    if (fileLabel) fileLabel.textContent = 'Belum ada file PDF dipilih.';
-
-    if (typeof renderTopUpFolders === 'function') renderTopUpFolders();
-    if (typeof updateDashboardStats === 'function') updateDashboardStats();
-    alert('Invoice Top Up PDF Berhasil Disimpan!');
 };
         window.deleteTopUp = function(id) { if(confirm('Hapus transaksi ini?')) { appData.topup = appData.topup.filter(t => t.id !== id); renderTopUpFolders(); updateDashboardStats(); } };
         window.applyTuFilter = function() { renderTopUpFolders(); };
