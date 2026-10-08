@@ -1672,46 +1672,100 @@
             if(found) pageInput.value = found.account;
         };
 
-        window.handleSaveTopUp = function(e) {
-            e.preventDefault();
-            const fileInput = document.getElementById('tuFile');
-            const file = fileInput.files[0];
-            const csCombined = document.getElementById('tuCS').value;
-            const csName = csCombined ? csCombined.split(' - ')[0] : '-';
-            
-            const saveEntry = (base64Img = null) => {
-                const newEntry = {
-                    id: 'tu-' + Date.now(),
-                    date: document.getElementById('tuDate').value,
-                    platform: document.getElementById('tuPlatform').value,
-                    cs: csName,
-                    pic: document.getElementById('tuPic').value,
-                    pageName: document.getElementById('tuPageName').value.trim(),
-                    nominal: document.getElementById('tuNominal').value,
-                    image: base64Img,
-                    fileName: file ? file.name : null
-                };
-                appData.topup.unshift(newEntry);
-                
-                sendToGoogleSheet("TopUp_Invoice",
-                    ["ID", "Tanggal", "Platform", "CS", "PIC", "Halaman", "Nominal", "File Name"],
-                    [newEntry.id, newEntry.date, newEntry.platform, newEntry.cs, newEntry.pic, newEntry.pageName, newEntry.nominal, newEntry.fileName || "Tidak ada gambar"]
-                );
+       window.handleSaveTopUp = async function(e) {
+    if (e && e.preventDefault) e.preventDefault();
 
-                document.getElementById('topupForm').reset();
-                document.getElementById('tuDate').value = new Date().toISOString().split('T')[0];
-                document.getElementById('tuFileName').textContent = 'Belum ada screenshot bukti dipilih.';
-                renderTopUpFolders(); updateDashboardStats(); showToast('Invoice Top Up Tersimpan!');
-            };
+    const fileInput = document.getElementById('tuFile');
+    const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+    const csCombined = document.getElementById('tucs') ? document.getElementById('tucs').value : '';
+    const csName = csCombined ? csCombined.split(' - ')[0] : '-';
 
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => saveEntry(e.target.result);
-                reader.readAsDataURL(file);
-            } else {
-                saveEntry(null);
-            }
+    const dateVal = document.getElementById('tuDate') ? document.getElementById('tuDate').value : new Date().toISOString().split('T')[0];
+    const platformVal = document.getElementById('tuPlatform') ? document.getElementById('tuPlatform').value : '-';
+    const picVal = document.getElementById('tuPic') ? document.getElementById('tuPic').value : '-';
+    const pageVal = document.getElementById('tuPageName') ? document.getElementById('tuPageName').value.trim() : '-';
+    
+    // Ambil nominal dan bersihkan tanda titik, koma, Rp
+    const rawNominal = document.getElementById('tuNominal') ? document.getElementById('tuNominal').value : '0';
+    const cleanNominal = parseInt(String(rawNominal).replace(/[^0-9]/g, '')) || 0;
+
+    const fileName = file ? file.name : '-';
+
+    if (cleanNominal <= 0) {
+        alert('Harap isi nominal top up dengan benar!');
+        return;
+    }
+
+    const saveEntry = async (base64Img = null) => {
+        const newEntry = {
+            id: 'tu-' + Date.now(),
+            date: dateVal,
+            platform: platformVal,
+            cs: csName,
+            pic: picVal,
+            pageName: pageVal,
+            nominal: cleanNominal,
+            image: base64Img,
+            fileName: fileName
         };
+
+        // 1. Simpan ke Local Storage / AppData
+        if (typeof appData !== 'undefined' && appData.topup) {
+            appData.topup.unshift(newEntry);
+            localStorage.setItem('sid_app_data', JSON.stringify(appData));
+        }
+
+        // 2. Kirim ke Server Vercel -> Google Apps Script
+        const headers = ["ID", "Tanggal", "Platform", "CS", "PIC", "Halaman", "Nominal", "File Name"];
+        const rowValues = [
+            String(newEntry.id),
+            String(newEntry.date),
+            String(newEntry.platform),
+            String(newEntry.cs),
+            String(newEntry.pic),
+            String(newEntry.pageName),
+            Number(newEntry.nominal),
+            String(newEntry.fileName)
+        ];
+
+        try {
+            await fetch('/api/save-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sheetName: 'TopUp_Invoice',
+                    headers: headers,
+                    values: rowValues,
+                    data: newEntry
+                })
+            });
+        } catch (err) {
+            console.error('Gagal kirim Top Up ke server:', err);
+        }
+
+        // 3. Reset form
+        const formEl = document.getElementById('topupForm');
+        if (formEl) formEl.reset();
+        
+        const dateEl = document.getElementById('tuDate');
+        if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+
+        const fileLabel = document.getElementById('tuFileName');
+        if (fileLabel) fileLabel.textContent = 'Belum ada screenshot bukti dipilih.';
+
+        if (typeof renderTopUpFolders === 'function') renderTopUpFolders();
+        if (typeof updateDashboardStats === 'function') updateDashboardStats();
+        if (typeof showToast === 'function') showToast('Invoice Top Up Tersimpan!');
+    };
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => saveEntry(ev.target.result);
+        reader.readAsDataURL(file);
+    } else {
+        saveEntry(null);
+    }
+};
 
         window.deleteTopUp = function(id) { if(confirm('Hapus transaksi ini?')) { appData.topup = appData.topup.filter(t => t.id !== id); renderTopUpFolders(); updateDashboardStats(); } };
         window.applyTuFilter = function() { renderTopUpFolders(); };
