@@ -2770,6 +2770,67 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (typeof renderWorkflowTable === 'function') renderWorkflowTable();
 });
+       window.switchWorkflowSubTab = function(tabName) {
+    // Ambil elemen tampilan form dan tampilan analitik
+    const formTab = document.getElementById('workflowTabInput') || document.querySelector('[data-tab="workflow-form"]');
+    const analyticsTab = document.getElementById('workflowTabAnalytics') || document.querySelector('[data-tab="workflow-analytics"]');
+    
+    // Ambil tombol tab di kanan atas
+    const btnForm = document.getElementById('btnTabWfForm');
+    const btnAnalytics = document.getElementById('btnTabWfAnalytics');
+
+    if (tabName === 'analytics') {
+        if (formTab) formTab.classList.add('hidden');
+        if (analyticsTab) analyticsTab.classList.remove('hidden');
+        
+        // Panggil fungsi gambar grafik dan analitik PIC
+        if (typeof window.renderPICAnalytics === 'function') {
+            window.renderPICAnalytics();
+        }
+    } else {
+        if (formTab) formTab.classList.remove('hidden');
+        if (analyticsTab) analyticsTab.classList.add('hidden');
+    }
+};
+       window.switchWorkflowTab = function(mode) {
+    const inputView = document.getElementById('workflowTabInput');
+    const analyticsView = document.getElementById('workflowTabAnalytics');
+    const btnInput = document.getElementById('btnTabWfInput');
+    const btnAnalytics = document.getElementById('btnTabWfAnalytics');
+
+    if (mode === 'analytics') {
+        if (inputView) inputView.classList.add('hidden');
+        if (analyticsView) analyticsView.classList.remove('hidden');
+
+        // Update styling tombol aktif
+        if (btnInput) {
+            btnInput.classList.remove('bg-white', 'text-calm-800', 'shadow-xs');
+            btnInput.classList.add('text-calm-600');
+        }
+        if (btnAnalytics) {
+            btnAnalytics.classList.add('bg-white', 'text-calm-800', 'shadow-xs');
+            btnAnalytics.classList.remove('text-calm-600');
+        }
+
+        // Render data grafik & statistik PIC
+        if (typeof window.renderPICAnalytics === 'function') {
+            window.renderPICAnalytics();
+        }
+    } else {
+        if (inputView) inputView.classList.remove('hidden');
+        if (analyticsView) analyticsView.classList.add('hidden');
+
+        // Update styling tombol aktif
+        if (btnInput) {
+            btnInput.classList.add('bg-white', 'text-calm-800', 'shadow-xs');
+            btnInput.classList.remove('text-calm-600');
+        }
+        if (btnAnalytics) {
+            btnAnalytics.classList.remove('bg-white', 'text-calm-800', 'shadow-xs');
+            btnAnalytics.classList.add('text-calm-600');
+        }
+    }
+};
 </script>
 </body>
 </html>
