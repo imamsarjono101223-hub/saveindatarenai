@@ -227,6 +227,89 @@
             </section>
 
             <!-- SECTION: ANALITIK & DM MASUK -->
+            <!-- SECTION: ANALITIK & DM MASUK (MATRIX PER JAM) -->
+<section id="section-analytic" class="tab-content hidden space-y-5">
+  <!-- Header & Toolbar -->
+  <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-calm-200">
+    <div>
+      <h2 class="text-xl font-black text-calm-900 flex items-center gap-2">
+        <i data-lucide="line-chart" class="w-5 h-5 text-calm-600"></i>
+        Analitik & Tracking DM Masuk Per Jam
+      </h2>
+      <p class="text-xs text-calm-500 mt-0.5">Catat performa DM masuk per jam shift kerja (11.00 - 18.00) sesuai akun & PIC</p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <div>
+        <label class="block text-[10px] font-bold uppercase tracking-wider text-calm-500 mb-1">Tanggal</label>
+        <input type="date" id="analyticDate" class="px-3 py-1.5 border border-calm-200 rounded-lg text-xs bg-calm-50 font-medium">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold uppercase tracking-wider text-calm-500 mb-1">Filter PIC</label>
+        <select id="analyticPicFilter" onchange="renderAnalyticMatrixTable()" class="px-3 py-1.5 border border-calm-200 rounded-lg text-xs bg-white font-bold text-calm-700">
+          <option value="ALL">Semua PIC</option>
+          <option value="DAFFA">DAFFA</option>
+          <option value="ARY">ARY</option>
+          <option value="IMAM">IMAM</option>
+          <option value="YUSUF">YUSUF</option>
+          <option value="RIZKY">RIZKY</option>
+          <option value="IQBAL">IQBAL</option>
+          <option value="FITRI">FITRI</option>
+          <option value="MALIK">MALIK</option>
+          <option value="FAJAR">FAJAR</option>
+        </select>
+      </div>
+      <div class="pt-3.5">
+        <button type="button" onclick="saveHourlyDmMatrix()" class="px-4 py-1.5 bg-calm-900 hover:bg-calm-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="save" class="w-4 h-4"></i> Simpan Input DM
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Matrix Table -->
+  <div class="bg-white rounded-xl shadow-sm border border-calm-200 overflow-hidden">
+    <div class="overflow-x-auto max-h-[680px]">
+      <table class="w-full text-xs text-left border-collapse" id="tableAnalyticMatrix">
+        <thead class="bg-amber-400 text-slate-900 sticky top-0 z-10 font-bold uppercase text-[11px] shadow-sm">
+          <tr>
+            <th class="p-2.5 border border-amber-500 min-w-[75px]">Amount</th>
+            <th class="p-2.5 border border-amber-500 min-w-[80px]">PIC</th>
+            <th class="p-2.5 border border-amber-500 min-w-[90px]">CS</th>
+            <th class="p-2.5 border border-amber-500 min-w-[170px]">Akun Halaman</th>
+            <th class="p-2.5 border border-amber-500 min-w-[140px]">Departemen</th>
+            <th class="p-1 border border-amber-500 text-center w-14">11.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">12.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">13.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">14.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">15.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">16.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">17.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">18.00</th>
+            <th class="p-2 border border-amber-500 text-center min-w-[65px] bg-amber-500 text-white font-extrabold">Total</th>
+          </tr>
+        </thead>
+        <tbody id="analyticMatrixBody" class="divide-y divide-calm-100 font-medium">
+          <!-- Diisi otomatis oleh JavaScript -->
+        </tbody>
+        <tfoot class="bg-slate-100 font-bold text-slate-800 sticky bottom-0 border-t-2 border-slate-300">
+          <tr>
+            <td colspan="5" class="p-2.5 border text-right font-black">TOTAL DM PER JAM:</td>
+            <td id="totCol11" class="p-1 border text-center text-blue-600 font-black">0</td>
+            <td id="totCol12" class="p-1 border text-center text-blue-600 font-black">0</td>
+            <td id="totCol13" class="p-1 border text-center text-blue-600 font-black">0</td>
+            <td id="totCol14" class="p-1 border text-center text-blue-600 font-black">0</td>
+            <td id="totCol15" class="p-1 border text-center text-blue-600 font-black">0</td>
+            <td id="totCol16" class="p-1 border text-center text-blue-600 font-black">0</td>
+            <td id="totCol17" class="p-1 border text-center text-blue-600 font-black">0</td>
+            <td id="totCol18" class="p-1 border text-center text-blue-600 font-black">0</td>
+            <td id="totColGrand" class="p-2 border text-center bg-slate-200 font-black text-sm text-emerald-700">0</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</section>
            <!-- KONTEN MENU ANALITIK & DM MASUK -->
 <div id="sectionAnalitik" class="space-y-6">
   <!-- Header & Kontrol -->
@@ -2923,6 +3006,173 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 };
+    // ==========================================
+// MATRIX TRACKING DM PER JAM (SINKRON SPREADSHEET)
+// ==========================================
+const MASTER_ACCOUNTS = [
+  { amount: 500, pic: 'DAFFA', cs: 'RINO', akun: 'Sinshe Huangshijing', dept: 'andrologi prostat- 前列腺' },
+  { amount: 450, pic: 'DAFFA', cs: 'DIAH', akun: 'Ren Ai TCM Holistik', dept: 'lambung asam lambung 胃-胃酸' },
+  { amount: 0,   pic: 'DAFFA', cs: 'NADA', akun: 'Sinshe Wangke', dept: 'nyeri saraf kejepit 疼痛-神经压迫' },
+  { amount: 432, pic: 'DAFFA', cs: 'AISYAH', akun: 'Sinshe Ruifa TCM Jakarta', dept: 'terapi kaki 理疗' },
+  { amount: 100, pic: 'DAFFA', cs: 'INDRI', akun: 'Sinshe Ren Ai TCM', dept: 'nyeri 疼痛' },
+  { amount: 500, pic: 'ARY', cs: 'TIARA', akun: 'Terapi Sehat Ren Ai Pluit', dept: 'andrologi - 男科' },
+  { amount: 735, pic: 'ARY', cs: 'ELISA', akun: 'Klinik Ren Ai Jakarta', dept: 'nyeri frozen shoulders 疼痛-肩周炎' },
+  { amount: 300, pic: 'ARY', cs: 'AI', akun: 'Ren Ai Terapi TCM Pluit Panjaringan', dept: 'nyeri pinggang 疼痛-腰' },
+  { amount: 360, pic: 'ARY', cs: 'ADHEL', akun: 'REN AI Klinik TCM-', dept: 'andrologi prostat- 前列腺' },
+  { amount: 500, pic: 'IMAM', cs: 'ICHA', akun: 'Sinshe Wangyingke', dept: 'Diet 减肥' },
+  { amount: 375, pic: 'IMAM', cs: 'ANA', akun: 'Ren Ai Klinik Sehat', dept: 'andrologi - 男科' },
+  { amount: 600, pic: 'IMAM', cs: 'IG OO', akun: 'Renai Tradisional Chinese Medicine (OO)', dept: 'ALL DEPT' },
+  { amount: 100, pic: 'IMAM', cs: 'DILLAH', akun: 'Sinshe Ruifa Ren Ai', dept: 'Prostat 前列腺' },
+  { amount: 0,   pic: 'IMAM', cs: 'ILHAM', akun: 'Sinshe Xijinbo TCM', dept: 'nyeri lutut 疼痛-膝盖' },
+  { amount: 0,   pic: 'IMAM', cs: 'NARWANTI', akun: 'Terapi Nyeri Ren Ai', dept: 'nyeri 疼痛' },
+  { amount: 500, pic: 'YUSUF', cs: 'AYU', akun: 'Sinshe Ren Ai', dept: 'terapi 理疗' },
+  { amount: 600, pic: 'YUSUF', cs: 'LAILA', akun: 'Terapi TCM Pluit', dept: 'terapi pinggang 理疗' },
+  { amount: 660, pic: 'RIZKY', cs: 'MUFI', akun: 'Terapi TCM Ren Ai', dept: 'terapi 理疗' },
+  { amount: 650, pic: 'RIZKY', cs: 'FANNY', akun: 'Ren Ai Penjaringan Jakarta', dept: 'terapi 理疗' },
+  { amount: 300, pic: 'RIZKY', cs: 'SYILAN', akun: 'Asisten sinshe xijinbo ren ai', dept: 'Kulit (Dermatitis)' },
+  { amount: 700, pic: 'IQBAL', cs: 'FIKA', akun: 'Ren Ai TCM Jakarta', dept: 'nyeri sendi 疼痛- 关节' },
+  { amount: 550, pic: 'IQBAL', cs: 'ANNISA', akun: 'TCM Sehat Ren Ai', dept: 'terapi 理疗' },
+  { amount: 500, pic: 'IQBAL', cs: 'SUNDARI', akun: 'Sinshe Tanglixin TCM', dept: 'nyeri 疼痛' },
+  { amount: 175, pic: 'IQBAL', cs: 'PIAH', akun: 'Holistic Medicine Pluit', dept: 'terapi 理疗' },
+  { amount: 400, pic: 'IQBAL', cs: 'IMEL', akun: 'Sinshe Wangjiajing TCM', dept: 'terapi kaki 理疗' },
+  { amount: 500, pic: 'FITRI', cs: 'RIA', akun: 'Ren Ai Tradisional', dept: 'nyeri sendi 疼痛- 关节' },
+  { amount: 400, pic: 'FITRI', cs: 'SELLY', akun: 'Ren Ai Sehat Jakarta', dept: 'NYERI' },
+  { amount: 400, pic: 'FITRI', cs: 'LARA', akun: 'Sinshe Shi Yanqi TCM', dept: 'andrologi - 男科' },
+  { amount: 900, pic: 'FITRI', cs: 'RIYAN', akun: 'Asisten Sinshe Tang Lixin', dept: 'stroke TIA 中风' },
+  { amount: 0,   pic: 'MALIK', cs: 'WULAN', akun: 'Ren Ai TCM Pluit', dept: 'andrologi - 男科' },
+  { amount: 0,   pic: 'MALIK', cs: 'EVA', akun: 'Sinshe Zhao Ren Ai', dept: 'andrologi - 男科' },
+  { amount: 0,   pic: 'MALIK', cs: 'MILDA', akun: 'Chinese Medicine Ren Ai', dept: 'terapi 理疗' },
+  { amount: 0,   pic: 'FAJAR', cs: 'LARA', akun: 'Klinik Sinshe Renai jakarta', dept: 'terapi 理疗' },
+  { amount: 500, pic: 'FAJAR', cs: 'NOVIOLA', akun: 'Klinik Pengobatan TCM', dept: 'nyeri otot 疼痛-肌肉' }
+];
+
+const TIME_SLOTS = ['11', '12', '13', '14', '15', '16', '17', '18'];
+let hourlyDataStore = {};
+
+function initAnalyticMatrix() {
+  const dateInput = document.getElementById('analyticDate');
+  if (dateInput && !dateInput.value) {
+    const today = new Date();
+    dateInput.value = today.toISOString().split('T')[0];
+  }
+  renderAnalyticMatrixTable();
+}
+
+function renderAnalyticMatrixTable() {
+  const tbody = document.getElementById('analyticMatrixBody');
+  const picEl = document.getElementById('analyticPicFilter');
+  if (!tbody || !picEl) return;
+
+  const filterPic = picEl.value;
+  tbody.innerHTML = '';
+  const filtered = filterPic === 'ALL' 
+    ? MASTER_ACCOUNTS 
+    : MASTER_ACCOUNTS.filter(a => a.pic === filterPic);
+
+  filtered.forEach((acc, index) => {
+    const accKey = `${acc.pic}_${acc.cs}_${acc.akun}`;
+    if (!hourlyDataStore[accKey]) {
+      hourlyDataStore[accKey] = { 11: '', 12: '', 13: '', 14: '', 15: '', 16: '', 17: '', 18: '' };
+    }
+
+    let tr = document.createElement('tr');
+    tr.className = 'hover:bg-amber-50/40 transition-colors';
+
+    let cellsHtml = `
+      <td class="p-2 border border-slate-200 font-bold text-slate-700">${acc.amount ? acc.amount + '.000' : '-'}</td>
+      <td class="p-2 border border-slate-200 font-black text-slate-800">${acc.pic}</td>
+      <td class="p-2 border border-slate-200 font-semibold text-slate-700">${acc.cs}</td>
+      <td class="p-2 border border-slate-200 text-slate-800">${acc.akun}</td>
+      <td class="p-2 border border-slate-200 text-slate-600">${acc.dept}</td>
+    `;
+
+    let rowTotal = 0;
+    TIME_SLOTS.forEach(hour => {
+      const val = hourlyDataStore[accKey][hour] || '';
+      rowTotal += Number(val) || 0;
+      cellsHtml += `
+        <td class="p-1 border border-slate-200 text-center">
+          <input type="text" 
+            data-key="${accKey}" 
+            data-hour="${hour}"
+            value="${val}" 
+            onchange="updateMatrixCell(this)"
+            placeholder="0"
+            class="w-11 text-center py-1 text-xs border border-slate-200 rounded font-semibold focus:border-amber-500 focus:bg-amber-50 focus:outline-none">
+        </td>
+      `;
+    });
+
+    cellsHtml += `
+      <td class="p-2 border border-slate-200 text-center font-black bg-slate-50 text-slate-900" id="rowTot_${index}">
+        ${rowTotal}
+      </td>
+    `;
+
+    tr.innerHTML = cellsHtml;
+    tbody.appendChild(tr);
+  });
+
+  calcMatrixTotals();
+  if (window.lucide) lucide.createIcons();
+}
+
+function updateMatrixCell(input) {
+  const key = input.dataset.key;
+  const hour = input.dataset.hour;
+  if (!hourlyDataStore[key]) hourlyDataStore[key] = {};
+  hourlyDataStore[key][hour] = input.value;
+  calcMatrixTotals();
+}
+
+function calcMatrixTotals() {
+  let colTotals = { 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0 };
+  let grandTotal = 0;
+
+  Object.values(hourlyDataStore).forEach(accData => {
+    TIME_SLOTS.forEach(hour => {
+      const val = Number(accData[hour]) || 0;
+      colTotals[hour] += val;
+      grandTotal += val;
+    });
+  });
+
+  TIME_SLOTS.forEach(hour => {
+    const el = document.getElementById(`totCol${hour}`);
+    if (el) el.innerText = colTotals[hour];
+  });
+
+  const grandEl = document.getElementById('totColGrand');
+  if (grandEl) grandEl.innerText = grandTotal;
+}
+
+async function saveHourlyDmMatrix() {
+  const dateVal = document.getElementById('analyticDate').value;
+  if (!dateVal) return alert('Pilih tanggal terlebih dahulu!');
+
+  try {
+    const payload = {
+      sheetName: "Analitik_DM_Per_Jam",
+      date: dateVal,
+      data: hourlyDataStore
+    };
+
+    const res = await fetch('/api/save-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    alert('Data DM Per Jam berhasil disimpan!');
+  } catch (err) {
+    alert('Gagal menyimpan: ' + err.message);
+  }
+}
+
+// Jalankan otomatis
+window.addEventListener('DOMContentLoaded', () => {
+  initAnalyticMatrix();
+});
 </script>
 </body>
 </html>
