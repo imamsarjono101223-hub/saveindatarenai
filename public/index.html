@@ -227,65 +227,91 @@
             </section>
 
             <!-- SECTION: ANALITIK & DM MASUK -->
-            <section id="section-analytic" class="tab-content hidden">
-                <div class="flex justify-between items-end border-b border-calm-200 pb-4 mb-6">
-                    <div>
-                        <h2 class="text-2xl font-black text-calm-900">Analitik & DM Masuk</h2>
-                        <p class="text-sm text-calm-500 mt-1">Pantau total biaya, DM masuk per hari, dan efisiensi CPA.</p>
-                    </div>
-                </div>
-                <div class="flex flex-col lg:flex-row gap-6">
-                    <div class="w-full lg:w-1/3 bg-white p-5 rounded-2xl border border-calm-100 shadow-sm h-fit">
-                        <h3 class="text-sm font-bold text-calm-800 mb-4 flex items-center gap-2 uppercase tracking-wide">
-                            <i data-lucide="bar-chart-2" class="w-4 h-4 text-calm-500"></i> Input Data Harian
-                        </h3>
-                        <form id="dmForm" class="space-y-4" onsubmit="handleSaveDM(event)">
-                            <div>
-                                <label class="block text-xs font-semibold text-calm-600 mb-1">Tanggal</label>
-                                <input type="date" id="dmDate" required class="w-full p-2.5 bg-calm-50 border border-calm-200 rounded-xl text-sm focus:ring-2 focus:ring-calm-800 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-calm-600 mb-1">Pilih CS / Halaman</label>
-                                <select id="dmCS" required class="w-full p-2.5 bg-calm-50 border border-calm-200 rounded-xl text-sm focus:ring-2 focus:ring-calm-800 outline-none">
-                                    <option value="">Pilih CS...</option>
-                                </select>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-semibold text-calm-600 mb-1">Total Biaya (Rp)</label>
-                                    <input type="number" id="dmCost" required placeholder="Cth: 150000" class="w-full p-2.5 bg-calm-50 border border-calm-200 rounded-xl text-sm focus:ring-2 focus:ring-calm-800 outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-calm-600 mb-1">Total DM Masuk</label>
-                                    <input type="number" id="dmCount" required placeholder="Cth: 25" class="w-full p-2.5 bg-calm-50 border border-calm-200 rounded-xl text-sm focus:ring-2 focus:ring-calm-800 outline-none">
-                                </div>
-                            </div>
-                            <button type="submit" class="w-full bg-calm-900 hover:bg-calm-800 text-white font-bold py-3 rounded-xl transition text-sm flex justify-center items-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i> Simpan Data Analitik
-                            </button>
-                        </form>
-                    </div>
-                    <div class="w-full lg:w-2/3 bg-white border border-calm-100 rounded-2xl shadow-sm overflow-hidden">
-                        <div class="p-4 bg-calm-50 border-b border-calm-100 flex justify-between items-center">
-                            <h3 class="text-xs font-bold text-calm-500 uppercase tracking-wider">Rekap Data & CPA Harian</h3>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-white border-b border-calm-100 text-[11px] uppercase tracking-wider text-calm-400">
-                                        <th class="p-4 font-bold">Tanggal</th>
-                                        <th class="p-4 font-bold">CS & Halaman</th>
-                                        <th class="p-4 font-bold text-right">Biaya (Cost)</th>
-                                        <th class="p-4 font-bold text-center">DM</th>
-                                        <th class="p-4 font-bold text-right">CPA (Biaya/DM)</th>
-                                        <th class="p-4 font-bold text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dmTableBody" class="text-sm divide-y divide-calm-50"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+           <!-- KONTEN MENU ANALITIK & DM MASUK -->
+<div id="sectionAnalitik" class="space-y-6">
+  <!-- Header & Kontrol -->
+  <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Tracking DM Masuk Per Jam</h2>
+      <p class="text-xs text-slate-500">Input dan pantau aliran DM per akun berdasarkan shift jam kerja</p>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <!-- Filter Tanggal -->
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-500">TANGGAL</label>
+        <input type="date" id="dmFilterDate" class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm">
+      </div>
+      <!-- Filter PIC -->
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-500">FILTER PIC</label>
+        <select id="dmFilterPic" class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm bg-white font-medium text-slate-700">
+          <option value="ALL">Semua PIC</option>
+          <option value="DAFFA">DAFFA</option>
+          <option value="ARY">ARY</option>
+          <option value="IMAM">IMAM</option>
+          <option value="YUSUF">YUSUF</option>
+          <option value="RIZKY">RIZKY</option>
+          <option value="IQBAL">IQBAL</option>
+          <option value="FITRI">FITRI</option>
+          <option value="MALIK">MALIK</option>
+          <option value="FAJAR">FAJAR</option>
+        </select>
+      </div>
+      <!-- Tombol Sync / Tarik Data -->
+      <div class="pt-4">
+        <button onclick="loadHourlyDmData()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold flex items-center gap-1.5">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i> Segarkan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Matrix Table Realtime -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto max-h-[650px]">
+      <table class="w-full text-xs text-left border-collapse" id="dmMatrixTable">
+        <thead class="bg-amber-400 text-slate-900 sticky top-0 z-10 font-bold uppercase text-[11px]">
+          <tr>
+            <th class="p-2 border border-amber-500 min-w-[70px]">Budget</th>
+            <th class="p-2 border border-amber-500 min-w-[80px]">PIC</th>
+            <th class="p-2 border border-amber-500 min-w-[90px]">CS</th>
+            <th class="p-2 border border-amber-500 min-w-[170px]">Akun Halaman</th>
+            <th class="p-2 border border-amber-500 min-w-[130px]">Penyakit / Dept</th>
+            <th class="p-1 border border-amber-500 text-center w-14">11.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">12.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">13.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">14.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">15.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">16.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">17.00</th>
+            <th class="p-1 border border-amber-500 text-center w-14">18.00</th>
+            <th class="p-2 border border-amber-500 text-center min-w-[60px] bg-amber-500 text-white">Total</th>
+            <th class="p-2 border border-amber-500 text-center min-w-[70px]">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="dmMatrixBody" class="divide-y divide-slate-200">
+          <!-- Diisi otomatis oleh JavaScript sesuai daftar akun masing-masing PIC -->
+        </tbody>
+        <tfoot class="bg-slate-100 font-bold text-slate-800 sticky bottom-0">
+          <tr id="dmMatrixFooter">
+            <td colspan="5" class="p-2 border text-right">TOTAL DM:</td>
+            <td id="tot11" class="p-1 border text-center text-blue-600">0</td>
+            <td id="tot12" class="p-1 border text-center text-blue-600">0</td>
+            <td id="tot13" class="p-1 border text-center text-blue-600">0</td>
+            <td id="tot14" class="p-1 border text-center text-blue-600">0</td>
+            <td id="tot15" class="p-1 border text-center text-blue-600">0</td>
+            <td id="tot16" class="p-1 border text-center text-blue-600">0</td>
+            <td id="tot17" class="p-1 border text-center text-blue-600">0</td>
+            <td id="tot18" class="p-1 border text-center text-blue-600">0</td>
+            <td id="totGrand" class="p-2 border text-center bg-slate-200 font-extrabold text-sm text-emerald-700">0</td>
+            <td class="p-2 border"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
             </section>
 
             <!-- SECTION: DATA CS & HALAMAN -->
