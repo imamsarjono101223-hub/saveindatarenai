@@ -226,15 +226,13 @@
                 </div>
             </section>
 
-            <!-- SECTION: ANALITIK & DM MASUK -->
-            <!-- SECTION: ANALITIK & DM MASUK (MATRIX PER JAM) -->
+           <!-- SECTION: ANALITIK & DM MASUK -->
 <section id="section-analytic" class="tab-content hidden space-y-5">
-  <!-- Header & Toolbar -->
   <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-calm-200">
     <div>
       <h2 class="text-xl font-black text-calm-900 flex items-center gap-2">
         <i data-lucide="line-chart" class="w-5 h-5 text-calm-600"></i>
-        Analitik & Tracking DM Masuk Per Jam
+        Tracking DM Masuk Per Jam
       </h2>
       <p class="text-xs text-calm-500 mt-0.5">Catat performa DM masuk per jam shift kerja (11.00 - 18.00) sesuai akun & PIC</p>
     </div>
@@ -267,17 +265,16 @@
     </div>
   </div>
 
-  <!-- Matrix Table -->
+  <!-- Single Matrix Table (Tanpa Amount) -->
   <div class="bg-white rounded-xl shadow-sm border border-calm-200 overflow-hidden">
     <div class="overflow-x-auto max-h-[680px]">
       <table class="w-full text-xs text-left border-collapse" id="tableAnalyticMatrix">
         <thead class="bg-amber-400 text-slate-900 sticky top-0 z-10 font-bold uppercase text-[11px] shadow-sm">
           <tr>
-            <th class="p-2.5 border border-amber-500 min-w-[75px]">Amount</th>
-            <th class="p-2.5 border border-amber-500 min-w-[80px]">PIC</th>
-            <th class="p-2.5 border border-amber-500 min-w-[90px]">CS</th>
-            <th class="p-2.5 border border-amber-500 min-w-[170px]">Akun Halaman</th>
-            <th class="p-2.5 border border-amber-500 min-w-[140px]">Departemen</th>
+            <th class="p-2.5 border border-amber-500 min-w-[85px]">PIC</th>
+            <th class="p-2.5 border border-amber-500 min-w-[95px]">CS</th>
+            <th class="p-2.5 border border-amber-500 min-w-[180px]">Akun Halaman</th>
+            <th class="p-2.5 border border-amber-500 min-w-[150px]">Departemen</th>
             <th class="p-1 border border-amber-500 text-center w-14">11.00</th>
             <th class="p-1 border border-amber-500 text-center w-14">12.00</th>
             <th class="p-1 border border-amber-500 text-center w-14">13.00</th>
@@ -289,12 +286,10 @@
             <th class="p-2 border border-amber-500 text-center min-w-[65px] bg-amber-500 text-white font-extrabold">Total</th>
           </tr>
         </thead>
-        <tbody id="analyticMatrixBody" class="divide-y divide-calm-100 font-medium">
-          <!-- Diisi otomatis oleh JavaScript -->
-        </tbody>
+        <tbody id="analyticMatrixBody" class="divide-y divide-calm-100 font-medium"></tbody>
         <tfoot class="bg-slate-100 font-bold text-slate-800 sticky bottom-0 border-t-2 border-slate-300">
           <tr>
-            <td colspan="5" class="p-2.5 border text-right font-black">TOTAL DM PER JAM:</td>
+            <td colspan="4" class="p-2.5 border text-right font-black">TOTAL DM PER JAM:</td>
             <td id="totCol11" class="p-1 border text-center text-blue-600 font-black">0</td>
             <td id="totCol12" class="p-1 border text-center text-blue-600 font-black">0</td>
             <td id="totCol13" class="p-1 border text-center text-blue-600 font-black">0</td>
@@ -398,62 +393,75 @@
             </section>
 
             <!-- SECTION: DATA CS & HALAMAN -->
-            <section id="section-cs" class="tab-content hidden">
-                <div class="flex justify-between items-end border-b border-calm-200 pb-4 mb-6">
-                    <div>
-                        <h2 class="text-2xl font-black text-calm-900">Data CS & Halaman</h2>
-                        <p class="text-sm text-calm-500 mt-1">Registrasi nama CS, halaman/FP, dan pembagian departemen.</p>
-                    </div>
-                </div>
-                <div class="flex flex-col lg:flex-row gap-6">
-                    <div class="w-full lg:w-1/3 bg-white p-5 rounded-2xl border border-calm-100 shadow-sm h-fit">
-                         <h3 class="text-sm font-bold text-calm-800 mb-4 flex items-center gap-2 uppercase tracking-wide">
-                            <i data-lucide="user-plus" class="w-4 h-4 text-calm-500"></i> Tambah / Edit CS
-                        </h3>
-                        <form id="csForm" class="space-y-4" onsubmit="handleSaveCS(event)">
-                            <input type="hidden" id="csId">
-                            <div>
-                                <label class="block text-xs font-semibold text-calm-600 mb-1">Nama CS (Identifier)</label>
-                                <input type="text" id="csName" required placeholder="Cth: CS DILLAH" class="w-full p-2.5 bg-calm-50 border border-calm-200 rounded-xl text-sm focus:ring-2 focus:ring-calm-800 outline-none uppercase placeholder-normal">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-calm-600 mb-1">Departemen / Kategori</label>
-                                <input type="text" id="csDept" required placeholder="Cth: ANDROLOGI / Nyeri" class="w-full p-2.5 bg-calm-50 border border-calm-200 rounded-xl text-sm focus:ring-2 focus:ring-calm-800 outline-none uppercase placeholder-normal">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-calm-600 mb-1">Nama Halaman (Page/FP)</label>
-                                <input type="text" id="csAccount" required placeholder="Cth: Sinshe Ruifa Ren Ai" class="w-full p-2.5 bg-calm-50 border border-calm-200 rounded-xl text-sm focus:ring-2 focus:ring-calm-800 outline-none">
-                            </div>
-                            <div class="flex gap-2 pt-2">
-                                <button type="submit" class="flex-1 bg-calm-900 hover:bg-calm-800 text-white font-bold py-3 rounded-xl transition text-sm">Simpan CS</button>
-                                <button type="button" onclick="clearCSForm()" class="px-4 bg-calm-100 hover:bg-calm-200 text-calm-600 font-bold rounded-xl transition text-sm">Batal</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="w-full lg:w-2/3 bg-white border border-calm-100 rounded-2xl shadow-sm overflow-hidden">
-                        <div class="p-4 bg-calm-50 border-b border-calm-100 flex justify-between items-center">
-                            <h3 class="text-xs font-bold text-calm-500 uppercase tracking-wider">Daftar Halaman Aktif</h3>
-                            <div class="relative">
-                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2 text-calm-400"></i>
-                                <input type="text" id="searchCS" placeholder="Cari CS/Halaman..." onkeyup="renderCSList()" class="pl-9 pr-3 py-1.5 text-sm bg-white border border-calm-200 rounded-lg focus:outline-none focus:border-calm-400">
-                            </div>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-white border-b border-calm-100 text-[11px] uppercase tracking-wider text-calm-400">
-                                        <th class="p-4 font-bold">Nama CS</th>
-                                        <th class="p-4 font-bold">Departemen</th>
-                                        <th class="p-4 font-bold">Halaman (Page)</th>
-                                        <th class="p-4 font-bold text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="csTableBody" class="text-sm divide-y divide-calm-50"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
+<section id="section-cs" class="tab-content hidden space-y-5">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Form Tambah CS / Akun Baru -->
+    <div class="bg-white p-5 rounded-2xl border border-calm-200 shadow-sm h-fit">
+      <h3 class="text-sm font-bold text-calm-800 mb-3 flex items-center gap-2 uppercase tracking-wide">
+        <i data-lucide="plus-circle" class="w-4 h-4 text-calm-600"></i> Tambah / Edit CS & Akun
+      </h3>
+      <form id="formAddCS" onsubmit="handleSaveCSAccount(event)" class="space-y-3">
+        <input type="hidden" id="csEditIndex" value="-1">
+        <div>
+          <label class="block text-[11px] font-bold text-calm-600 uppercase mb-1">Pilih PIC</label>
+          <select id="csInputPic" required class="w-full p-2 border border-calm-200 rounded-lg text-xs font-semibold bg-white">
+            <option value="DAFFA">DAFFA</option>
+            <option value="ARY">ARY</option>
+            <option value="IMAM">IMAM</option>
+            <option value="YUSUF">YUSUF</option>
+            <option value="RIZKY">RIZKY</option>
+            <option value="IQBAL">IQBAL</option>
+            <option value="FITRI">FITRI</option>
+            <option value="MALIK">MALIK</option>
+            <option value="FAJAR">FAJAR</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-calm-600 uppercase mb-1">Nama CS</label>
+          <input type="text" id="csInputName" required placeholder="Contoh: RINO" class="w-full p-2 border border-calm-200 rounded-lg text-xs font-medium">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-calm-600 uppercase mb-1">Nama Akun Halaman</label>
+          <input type="text" id="csInputAkun" required placeholder="Contoh: Sinshe Huangshijing" class="w-full p-2 border border-calm-200 rounded-lg text-xs font-medium">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-calm-600 uppercase mb-1">Departemen / Penyakit</label>
+          <input type="text" id="csInputDept" required placeholder="Contoh: andrologi prostat" class="w-full p-2 border border-calm-200 rounded-lg text-xs font-medium">
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="submit" id="btnSubmitCS" class="flex-1 py-2 bg-calm-900 hover:bg-calm-800 text-white rounded-lg text-xs font-bold">
+            Simpan Akun
+          </button>
+          <button type="button" onclick="resetFormCS()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold">
+            Batal
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tabel Daftar CS & Halaman -->
+    <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-calm-200 shadow-sm overflow-hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-bold text-calm-800 uppercase tracking-wide">Daftar CS & Akun Aktif</h3>
+        <span id="csTotalBadge" class="text-xs px-2.5 py-1 bg-amber-100 text-amber-800 font-black rounded-full">0 Akun</span>
+      </div>
+      <div class="overflow-x-auto max-h-[580px]">
+        <table class="w-full text-xs text-left border-collapse">
+          <thead class="bg-slate-50 text-slate-700 font-bold uppercase sticky top-0 border-b border-slate-200">
+            <tr>
+              <th class="p-2.5">PIC</th>
+              <th class="p-2.5">CS</th>
+              <th class="p-2.5">Akun Halaman</th>
+              <th class="p-2.5">Departemen</th>
+              <th class="p-2.5 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="csTableBody" class="divide-y divide-slate-100 font-medium"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
 
             <!-- SECTION: PENYIMPANAN AKUN (VAULT) -->
             <section id="section-vault" class="tab-content hidden">
@@ -3006,55 +3014,165 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 };
-    // ==========================================
-// MATRIX TRACKING DM PER JAM (SINKRON SPREADSHEET)
-// ==========================================
-const MASTER_ACCOUNTS = [
-  { amount: 500, pic: 'DAFFA', cs: 'RINO', akun: 'Sinshe Huangshijing', dept: 'andrologi prostat- 前列腺' },
-  { amount: 450, pic: 'DAFFA', cs: 'DIAH', akun: 'Ren Ai TCM Holistik', dept: 'lambung asam lambung 胃-胃酸' },
-  { amount: 0,   pic: 'DAFFA', cs: 'NADA', akun: 'Sinshe Wangke', dept: 'nyeri saraf kejepit 疼痛-神经压迫' },
-  { amount: 432, pic: 'DAFFA', cs: 'AISYAH', akun: 'Sinshe Ruifa TCM Jakarta', dept: 'terapi kaki 理疗' },
-  { amount: 100, pic: 'DAFFA', cs: 'INDRI', akun: 'Sinshe Ren Ai TCM', dept: 'nyeri 疼痛' },
-  { amount: 500, pic: 'ARY', cs: 'TIARA', akun: 'Terapi Sehat Ren Ai Pluit', dept: 'andrologi - 男科' },
-  { amount: 735, pic: 'ARY', cs: 'ELISA', akun: 'Klinik Ren Ai Jakarta', dept: 'nyeri frozen shoulders 疼痛-肩周炎' },
-  { amount: 300, pic: 'ARY', cs: 'AI', akun: 'Ren Ai Terapi TCM Pluit Panjaringan', dept: 'nyeri pinggang 疼痛-腰' },
-  { amount: 360, pic: 'ARY', cs: 'ADHEL', akun: 'REN AI Klinik TCM-', dept: 'andrologi prostat- 前列腺' },
-  { amount: 500, pic: 'IMAM', cs: 'ICHA', akun: 'Sinshe Wangyingke', dept: 'Diet 减肥' },
-  { amount: 375, pic: 'IMAM', cs: 'ANA', akun: 'Ren Ai Klinik Sehat', dept: 'andrologi - 男科' },
-  { amount: 600, pic: 'IMAM', cs: 'IG OO', akun: 'Renai Tradisional Chinese Medicine (OO)', dept: 'ALL DEPT' },
-  { amount: 100, pic: 'IMAM', cs: 'DILLAH', akun: 'Sinshe Ruifa Ren Ai', dept: 'Prostat 前列腺' },
-  { amount: 0,   pic: 'IMAM', cs: 'ILHAM', akun: 'Sinshe Xijinbo TCM', dept: 'nyeri lutut 疼痛-膝盖' },
-  { amount: 0,   pic: 'IMAM', cs: 'NARWANTI', akun: 'Terapi Nyeri Ren Ai', dept: 'nyeri 疼痛' },
-  { amount: 500, pic: 'YUSUF', cs: 'AYU', akun: 'Sinshe Ren Ai', dept: 'terapi 理疗' },
-  { amount: 600, pic: 'YUSUF', cs: 'LAILA', akun: 'Terapi TCM Pluit', dept: 'terapi pinggang 理疗' },
-  { amount: 660, pic: 'RIZKY', cs: 'MUFI', akun: 'Terapi TCM Ren Ai', dept: 'terapi 理疗' },
-  { amount: 650, pic: 'RIZKY', cs: 'FANNY', akun: 'Ren Ai Penjaringan Jakarta', dept: 'terapi 理疗' },
-  { amount: 300, pic: 'RIZKY', cs: 'SYILAN', akun: 'Asisten sinshe xijinbo ren ai', dept: 'Kulit (Dermatitis)' },
-  { amount: 700, pic: 'IQBAL', cs: 'FIKA', akun: 'Ren Ai TCM Jakarta', dept: 'nyeri sendi 疼痛- 关节' },
-  { amount: 550, pic: 'IQBAL', cs: 'ANNISA', akun: 'TCM Sehat Ren Ai', dept: 'terapi 理疗' },
-  { amount: 500, pic: 'IQBAL', cs: 'SUNDARI', akun: 'Sinshe Tanglixin TCM', dept: 'nyeri 疼痛' },
-  { amount: 175, pic: 'IQBAL', cs: 'PIAH', akun: 'Holistic Medicine Pluit', dept: 'terapi 理疗' },
-  { amount: 400, pic: 'IQBAL', cs: 'IMEL', akun: 'Sinshe Wangjiajing TCM', dept: 'terapi kaki 理疗' },
-  { amount: 500, pic: 'FITRI', cs: 'RIA', akun: 'Ren Ai Tradisional', dept: 'nyeri sendi 疼痛- 关节' },
-  { amount: 400, pic: 'FITRI', cs: 'SELLY', akun: 'Ren Ai Sehat Jakarta', dept: 'NYERI' },
-  { amount: 400, pic: 'FITRI', cs: 'LARA', akun: 'Sinshe Shi Yanqi TCM', dept: 'andrologi - 男科' },
-  { amount: 900, pic: 'FITRI', cs: 'RIYAN', akun: 'Asisten Sinshe Tang Lixin', dept: 'stroke TIA 中风' },
-  { amount: 0,   pic: 'MALIK', cs: 'WULAN', akun: 'Ren Ai TCM Pluit', dept: 'andrologi - 男科' },
-  { amount: 0,   pic: 'MALIK', cs: 'EVA', akun: 'Sinshe Zhao Ren Ai', dept: 'andrologi - 男科' },
-  { amount: 0,   pic: 'MALIK', cs: 'MILDA', akun: 'Chinese Medicine Ren Ai', dept: 'terapi 理疗' },
-  { amount: 0,   pic: 'FAJAR', cs: 'LARA', akun: 'Klinik Sinshe Renai jakarta', dept: 'terapi 理疗' },
-  { amount: 500, pic: 'FAJAR', cs: 'NOVIOLA', akun: 'Klinik Pengobatan TCM', dept: 'nyeri otot 疼痛-肌肉' }
+// Data Awal Akun
+const DEFAULT_ACCOUNTS = [
+  { pic: 'DAFFA', cs: 'RINO', akun: 'Sinshe Huangshijing', dept: 'andrologi prostat- 前列腺' },
+  { pic: 'DAFFA', cs: 'DIAH', akun: 'Ren Ai TCM Holistik', dept: 'lambung asam lambung 胃-胃酸' },
+  { pic: 'DAFFA', cs: 'NADA', akun: 'Sinshe Wangke', dept: 'nyeri saraf kejepit 疼痛-神经压迫' },
+  { pic: 'DAFFA', cs: 'AISYAH', akun: 'Sinshe Ruifa TCM Jakarta', dept: 'terapi kaki 理疗' },
+  { pic: 'DAFFA', cs: 'INDRI', akun: 'Sinshe Ren Ai TCM', dept: 'nyeri 疼痛' },
+  { pic: 'ARY', cs: 'TIARA', akun: 'Terapi Sehat Ren Ai Pluit', dept: 'andrologi - 男科' },
+  { pic: 'ARY', cs: 'ELISA', akun: 'Klinik Ren Ai Jakarta', dept: 'nyeri frozen shoulders 疼痛-肩周炎' },
+  { pic: 'ARY', cs: 'AI', akun: 'Ren Ai Terapi TCM Pluit Panjaringan', dept: 'nyeri pinggang 疼痛-腰' },
+  { pic: 'ARY', cs: 'ADHEL', akun: 'REN AI Klinik TCM-', dept: 'andrologi prostat- 前列腺' },
+  { pic: 'IMAM', cs: 'ICHA', akun: 'Sinshe Wangyingke', dept: 'Diet 减肥' },
+  { pic: 'IMAM', cs: 'ANA', akun: 'Ren Ai Klinik Sehat', dept: 'andrologi - 男科' },
+  { pic: 'IMAM', cs: 'IG OO', akun: 'Renai Tradisional Chinese Medicine (OO)', dept: 'ALL DEPT' },
+  { pic: 'IMAM', cs: 'DILLAH', akun: 'Sinshe Ruifa Ren Ai', dept: 'Prostat 前列腺' },
+  { pic: 'IMAM', cs: 'ILHAM', akun: 'Sinshe Xijinbo TCM', dept: 'nyeri lutut 疼痛-膝盖' },
+  { pic: 'IMAM', cs: 'NARWANTI', akun: 'Terapi Nyeri Ren Ai', dept: 'nyeri 疼痛' },
+  { pic: 'YUSUF', cs: 'AYU', akun: 'Sinshe Ren Ai', dept: 'terapi 理疗' },
+  { pic: 'YUSUF', cs: 'LAILA', akun: 'Terapi TCM Pluit', dept: 'terapi pinggang 理疗' },
+  { pic: 'RIZKY', cs: 'MUFI', akun: 'Terapi TCM Ren Ai', dept: 'terapi 理疗' },
+  { pic: 'RIZKY', cs: 'FANNY', akun: 'Ren Ai Penjaringan Jakarta', dept: 'terapi 理疗' },
+  { pic: 'RIZKY', cs: 'SYILAN', akun: 'Asisten sinshe xijinbo ren ai', dept: 'Kulit (Dermatitis)' },
+  { pic: 'IQBAL', cs: 'FIKA', akun: 'Ren Ai TCM Jakarta', dept: 'nyeri sendi 疼痛- 关节' },
+  { pic: 'IQBAL', cs: 'ANNISA', akun: 'TCM Sehat Ren Ai', dept: 'terapi 理疗' },
+  { pic: 'IQBAL', cs: 'SUNDARI', akun: 'Sinshe Tanglixin TCM', dept: 'nyeri 疼痛' },
+  { pic: 'IQBAL', cs: 'PIAH', akun: 'Holistic Medicine Pluit', dept: 'terapi 理疗' },
+  { pic: 'IQBAL', cs: 'IMEL', akun: 'Sinshe Wangjiajing TCM', dept: 'terapi kaki 理疗' },
+  { pic: 'FITRI', cs: 'RIA', akun: 'Ren Ai Tradisional', dept: 'nyeri sendi 疼痛- 关节' },
+  { pic: 'FITRI', cs: 'SELLY', akun: 'Ren Ai Sehat Jakarta', dept: 'NYERI' },
+  { pic: 'FITRI', cs: 'LARA', akun: 'Sinshe Shi Yanqi TCM', dept: 'andrologi - 男科' },
+  { pic: 'FITRI', cs: 'RIYAN', akun: 'Asisten Sinshe Tang Lixin', dept: 'stroke TIA 中风' },
+  { pic: 'MALIK', cs: 'WULAN', akun: 'Ren Ai TCM Pluit', dept: 'andrologi - 男科' },
+  { pic: 'MALIK', cs: 'EVA', akun: 'Sinshe Zhao Ren Ai', dept: 'andrologi - 男科' },
+  { pic: 'MALIK', cs: 'MILDA', akun: 'Chinese Medicine Ren Ai', dept: 'terapi 理疗' },
+  { pic: 'FAJAR', cs: 'LARA', akun: 'Klinik Sinshe Renai jakarta', dept: 'terapi 理疗' },
+  { pic: 'FAJAR', cs: 'NOVIOLA', akun: 'Klinik Pengobatan TCM', dept: 'nyeri otot 疼痛-肌肉' }
 ];
 
+function getMasterAccounts() {
+  const saved = localStorage.getItem('APP_CS_ACCOUNTS');
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) {}
+  }
+  localStorage.setItem('APP_CS_ACCOUNTS', JSON.stringify(DEFAULT_ACCOUNTS));
+  return DEFAULT_ACCOUNTS;
+}
+
+function saveMasterAccounts(accounts) {
+  localStorage.setItem('APP_CS_ACCOUNTS', JSON.stringify(accounts));
+  // Sinkronkan ke semua tampilan
+  renderCSTable();
+  renderAnalyticMatrixTable();
+  syncAllAccountDropdowns();
+}
+
+// 1. MANAJEMEN DATA CS & HALAMAN
+function renderCSTable() {
+  const tbody = document.getElementById('csTableBody');
+  const badge = document.getElementById('csTotalBadge');
+  if (!tbody) return;
+
+  const accounts = getMasterAccounts();
+  if (badge) badge.innerText = `${accounts.length} Akun`;
+
+  tbody.innerHTML = '';
+  accounts.forEach((acc, idx) => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-slate-50 transition-colors';
+    tr.innerHTML = `
+      <td class="p-2.5 font-black text-slate-800">${acc.pic}</td>
+      <td class="p-2.5 font-bold text-slate-700">${acc.cs}</td>
+      <td class="p-2.5 text-slate-800">${acc.akun}</td>
+      <td class="p-2.5 text-slate-600">${acc.dept}</td>
+      <td class="p-2.5 text-center space-x-1">
+        <button onclick="editCSAccount(${idx})" class="p-1 text-blue-600 hover:bg-blue-50 rounded"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+        <button onclick="deleteCSAccount(${idx})" class="p-1 text-red-600 hover:bg-red-50 rounded"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  if (window.lucide) lucide.createIcons();
+}
+
+function handleSaveCSAccount(e) {
+  e.preventDefault();
+  const idx = parseInt(document.getElementById('csEditIndex').value);
+  const pic = document.getElementById('csInputPic').value;
+  const cs = document.getElementById('csInputName').value.trim();
+  const akun = document.getElementById('csInputAkun').value.trim();
+  const dept = document.getElementById('csInputDept').value.trim();
+
+  let accounts = getMasterAccounts();
+  const newObj = { pic, cs, akun, dept };
+
+  if (idx >= 0) {
+    accounts[idx] = newObj;
+  } else {
+    accounts.push(newObj);
+  }
+
+  saveMasterAccounts(accounts);
+  resetFormCS();
+  alert('Akun CS berhasil disimpan & otomatis terhubung ke semua menu!');
+}
+
+function editCSAccount(idx) {
+  const acc = getMasterAccounts()[idx];
+  if (!acc) return;
+  document.getElementById('csEditIndex').value = idx;
+  document.getElementById('csInputPic').value = acc.pic;
+  document.getElementById('csInputName').value = acc.cs;
+  document.getElementById('csInputAkun').value = acc.akun;
+  document.getElementById('csInputDept').value = acc.dept;
+  document.getElementById('btnSubmitCS').innerText = 'Update Akun';
+}
+
+function deleteCSAccount(idx) {
+  if (confirm('Hapus akun ini dari seluruh funnel?')) {
+    let accounts = getMasterAccounts();
+    accounts.splice(idx, 1);
+    saveMasterAccounts(accounts);
+  }
+}
+
+function resetFormCS() {
+  document.getElementById('csEditIndex').value = '-1';
+  document.getElementById('formAddCS').reset();
+  document.getElementById('btnSubmitCS').innerText = 'Simpan Akun';
+}
+
+// 2. OTOMATISASI DROPDOWN DI SELURUH FUNNEL
+function syncAllAccountDropdowns() {
+  const accounts = getMasterAccounts();
+  // Dropdown Topup CS
+  const topupSelect = document.getElementById('topupCS') || document.getElementById('csSelect');
+  if (topupSelect) {
+    const curVal = topupSelect.value;
+    topupSelect.innerHTML = '<option value="">Pilih CS / Akun...</option>';
+    accounts.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = `${a.cs} - ${a.akun}`;
+      opt.text = `${a.cs} - ${a.akun}`;
+      topupSelect.appendChild(opt);
+    });
+    topupSelect.value = curVal;
+  }
+}
+
+// 3. MATRIX ANALITIK (TANPA KOLOM AMOUNT)
 const TIME_SLOTS = ['11', '12', '13', '14', '15', '16', '17', '18'];
 let hourlyDataStore = {};
 
 function initAnalyticMatrix() {
   const dateInput = document.getElementById('analyticDate');
   if (dateInput && !dateInput.value) {
-    const today = new Date();
-    dateInput.value = today.toISOString().split('T')[0];
+    dateInput.value = new Date().toISOString().split('T')[0];
   }
+  renderCSTable();
+  syncAllAccountDropdowns();
   renderAnalyticMatrixTable();
 }
 
@@ -3063,11 +3181,13 @@ function renderAnalyticMatrixTable() {
   const picEl = document.getElementById('analyticPicFilter');
   if (!tbody || !picEl) return;
 
+  const accounts = getMasterAccounts();
   const filterPic = picEl.value;
   tbody.innerHTML = '';
+  
   const filtered = filterPic === 'ALL' 
-    ? MASTER_ACCOUNTS 
-    : MASTER_ACCOUNTS.filter(a => a.pic === filterPic);
+    ? accounts 
+    : accounts.filter(a => a.pic === filterPic);
 
   filtered.forEach((acc, index) => {
     const accKey = `${acc.pic}_${acc.cs}_${acc.akun}`;
@@ -3079,11 +3199,10 @@ function renderAnalyticMatrixTable() {
     tr.className = 'hover:bg-amber-50/40 transition-colors';
 
     let cellsHtml = `
-      <td class="p-2 border border-slate-200 font-bold text-slate-700">${acc.amount ? acc.amount + '.000' : '-'}</td>
-      <td class="p-2 border border-slate-200 font-black text-slate-800">${acc.pic}</td>
-      <td class="p-2 border border-slate-200 font-semibold text-slate-700">${acc.cs}</td>
-      <td class="p-2 border border-slate-200 text-slate-800">${acc.akun}</td>
-      <td class="p-2 border border-slate-200 text-slate-600">${acc.dept}</td>
+      <td class="p-2.5 border border-slate-200 font-black text-slate-800">${acc.pic}</td>
+      <td class="p-2.5 border border-slate-200 font-bold text-slate-700">${acc.cs}</td>
+      <td class="p-2.5 border border-slate-200 text-slate-800">${acc.akun}</td>
+      <td class="p-2.5 border border-slate-200 text-slate-600">${acc.dept}</td>
     `;
 
     let rowTotal = 0;
@@ -3162,14 +3281,13 @@ async function saveHourlyDmMatrix() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const result = await res.json();
+    await res.json();
     alert('Data DM Per Jam berhasil disimpan!');
   } catch (err) {
     alert('Gagal menyimpan: ' + err.message);
   }
 }
 
-// Jalankan otomatis
 window.addEventListener('DOMContentLoaded', () => {
   initAnalyticMatrix();
 });
