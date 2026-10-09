@@ -28,14 +28,12 @@ app.use('/api/', globalLimiter);
 // 3. ANTI-BRUTE FORCE KHUSUS LOGIN
 // Maksimal hanya boleh mencoba password 5 kali dalam 15 menit per IP
 const loginBruteForceLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: { 
-    success: false, 
-    message: 'Terlalu banyak percobaan login gagal! Akun dikunci sementara selama 15 menit.' 
-  },
-  standardHeaders: true,
-  legacyHeaders: false
+  windowMs: 5 * 60 * 1000, // 5 menit
+  max: 100, // izinkan 100 kali login
+  message: {
+    success: false,
+    message: 'Terlalu banyak request login, coba lagi sebentar.'
+  }
 });
 
 // Middleware standar
@@ -49,7 +47,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyi1diuFZ4lczKc0d83YObHkIQP__gRcUn1kDMjnNpoKoEBlan1s_2yFLNHf8NB2Q5wA/exec";
 
 // 4. Endpoint Login (Diproteksi loginBruteForceLimiter)
-app.post('/api/login', loginBruteForceLimiter, (req, res) => {
+// UBAH JADI:
+app.post('/api/login', (req, res) => {
   const { password } = req.body;
   if (password === 'RENAI') {
     return res.json({ success: true, token: 'AUTH_SUCCESS_TOKEN_RENAI_2026' });
