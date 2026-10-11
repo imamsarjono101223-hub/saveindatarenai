@@ -3228,73 +3228,150 @@ function initAnalyticMatrix() {
   if (typeof runHourlyDmAnalysis === 'function') runHourlyDmAnalysis();
 }
 
+// --- MASTER DAFTAR CS RESMI REN AI ---
+const RENAI_CS_MASTER = [
+  // DAFFA
+  { pic: 'DAFFA', cs: 'RINO', akun: 'Sinshe Huangshijing', dept: 'andrologi prostat- 前列腺' },
+  { pic: 'DAFFA', cs: 'DIAH', akun: 'Ren Ai TCM Holistik', dept: 'lambung asam lambung 胃-胃酸' },
+  { pic: 'DAFFA', cs: 'NADA', akun: 'Sinshe Wangke', dept: 'nyeri saraf kejepit 疼痛-神经压迫' },
+  { pic: 'DAFFA', cs: 'AISYAH', akun: 'Sinshe Ruifa TCM Jakarta', dept: 'terapi kaki 理疗' },
+  { pic: 'DAFFA', cs: 'INDRI', akun: 'Sinshe Ren Ai TCM', dept: 'nyeri 疼痛' },
+  // ARY
+  { pic: 'ARY', cs: 'TIARA', akun: 'Terapi Sehat Ren Ai Pluit', dept: 'andrologi - 男科' },
+  { pic: 'ARY', cs: 'ELISA', akun: 'Klinik Ren Ai Jakarta', dept: 'nyeri frozen shoulders 疼痛-肩周炎' },
+  { pic: 'ARY', cs: 'AI', akun: 'Ren Ai Terapi TCM Pluit Panjaringan', dept: 'nyeri pinggang 疼痛-腰' },
+  { pic: 'ARY', cs: 'ADHEL', akun: 'REN AI Klinik TCM-', dept: 'andrologi prostat- 前列腺' },
+  // IMAM
+  { pic: 'IMAM', cs: 'ICHA', akun: 'Sinshe Wangyingke', dept: 'Diet 减肥' },
+  { pic: 'IMAM', cs: 'ANA', akun: 'Ren Ai Klinik Sehat', dept: 'andrologi - 男科' },
+  { pic: 'IMAM', cs: 'IG OO', akun: 'Renai Tradisional Chinese Medicine (OO)', dept: 'ALL DEPT' },
+  { pic: 'IMAM', cs: 'DILLAH', akun: 'Sinshe Ruifa Ren Ai', dept: 'Prostat 前列腺' },
+  { pic: 'IMAM', cs: 'ILHAM', akun: 'Sinshe Xijinbo TCM', dept: 'nyeri lutut 疼痛-膝盖' },
+  { pic: 'IMAM', cs: 'NARWANTI', akun: 'Terapi Nyeri Ren Ai', dept: 'nyeri 疼痛' },
+  // YUSUF
+  { pic: 'YUSUF', cs: 'AYU', akun: 'Sinshe Ren Ai', dept: 'terapi 理疗' },
+  { pic: 'YUSUF', cs: 'LAILA', akun: 'Terapi TCM Pluit', dept: 'terapi pinggang 理疗' },
+  // RIZKY
+  { pic: 'RIZKY', cs: 'MUFI', akun: 'Terapi TCM Ren Ai', dept: 'terapi 理疗' },
+  { pic: 'RIZKY', cs: 'FANNY', akun: 'Ren Ai Penjaringan Jakarta', dept: 'terapi 理疗' },
+  { pic: 'RIZKY', cs: 'SYILAN', akun: 'Asisten sinshe xijinbo ren ai', dept: 'Kulit (Dermatitis)' },
+  // IQBAL
+  { pic: 'IQBAL', cs: 'FIKA', akun: 'Ren Ai TCM Jakarta', dept: 'nyeri sendi 疼痛- 关节' },
+  { pic: 'IQBAL', cs: 'ANNISA', akun: 'TCM Sehat Ren Ai', dept: 'terapi 理疗' },
+  { pic: 'IQBAL', cs: 'SUNDARI', akun: 'Sinshe Tanglixin TCM', dept: 'nyeri 疼痛' },
+  { pic: 'IQBAL', cs: 'PIAH', akun: 'Holistic Medicine Pluit', dept: 'terapi 理疗' },
+  { pic: 'IQBAL', cs: 'IMEL', akun: 'Sinshe Wangjiajing TCM', dept: 'terapi kaki 理疗' },
+  // FITRI
+  { pic: 'FITRI', cs: 'RIA', akun: 'Ren Ai Tradisional', dept: 'nyeri sendi 疼痛- 关节' },
+  { pic: 'FITRI', cs: 'SELLY', akun: 'Ren Ai Sehat Jakarta', dept: 'NYERI' },
+  { pic: 'FITRI', cs: 'LARA', akun: 'Sinshe Shi Yanqi TCM', dept: 'andrologi - 男科' },
+  { pic: 'FITRI', cs: 'RIYAN', akun: 'Asisten Sinshe Tang Lixin', dept: 'stroke TIA 中风' },
+  // MALIK
+  { pic: 'MALIK', cs: 'WULAN', akun: 'Ren Ai TCM Pluit', dept: 'andrologi - 男科' },
+  { pic: 'MALIK', cs: 'EVA', akun: 'Sinshe Zhao Ren Ai', dept: 'andrologi - 男科' },
+  { pic: 'MALIK', cs: 'MILDA', akun: 'Chinese Medicine Ren Ai', dept: 'terapi 理疗' },
+  // FAJAR
+  { pic: 'FAJAR', cs: 'LARA', akun: 'Klinik Sinshe Renai jakarta', dept: 'terapi 理疗' },
+  { pic: 'FAJAR', cs: 'NOVIOLA', akun: 'Klinik Pengobatan TCM', dept: 'nyeri otot 疼痛-肌肉' }
+];
+
 function renderAnalyticMatrixTable() {
-  const tbody = document.getElementById('analyticMatrixBody') || 
-                document.getElementById('dmMatrixBody') || 
-                document.querySelector('table tbody');
-  const picEl = document.getElementById('analyticPicFilter') || 
-                document.getElementById('dmFilterPic');
-  if (!tbody) return;
+  // Tangkap tbody tabel secara presisi
+  let tbody = document.getElementById('analyticMatrixBody') || 
+              document.getElementById('dmMatrixBody') || 
+              document.querySelector('#section-analytic table tbody') ||
+              document.querySelector('table tbody');
 
-  let accounts = [];
-  if (typeof getMasterAccounts === 'function') {
-    accounts = getMasterAccounts();
-  }
-  if (!accounts || accounts.length === 0) {
-    accounts = DEFAULT_FALLBACK_ACCOUNTS;
+  if (!tbody) {
+    console.warn('Tbody belum siap, mencoba lagi...');
+    return;
   }
 
-  const rawVal = picEl ? (picEl.value || '').trim().toUpperCase() : 'ALL';
-    const filterPic = (!rawVal || rawVal === 'ALL' || rawVal.includes('SEMUA')) ? 'ALL' : rawVal;
-    tbody.innerHTML = '';
+  // Tangkap dropdown filter PIC jika dipilih
+  const picEl = document.getElementById('dmFilterPic') || 
+                document.getElementById('analyticPicFilter') ||
+                document.querySelector('select');
+  
+  const rawPic = picEl ? (picEl.value || '').trim().toUpperCase() : 'ALL';
+  const filterPic = (!rawPic || rawPic === 'ALL' || rawPic.includes('SEMUA')) ? 'ALL' : rawPic;
 
-    const filtered = (filterPic === 'ALL')
-      ? accounts
-      : accounts.filter(a => a.pic && a.pic.toUpperCase() === filterPic);
+  // Filter daftar CS
+  const accountsToRender = (filterPic === 'ALL')
+    ? RENAI_CS_MASTER
+    : RENAI_CS_MASTER.filter(a => a.pic.toUpperCase() === filterPic);
 
-  filtered.forEach((acc, index) => {
+  const hours = ['11', '12', '13', '14', '15', '16', '17', '18'];
+  let htmlRows = '';
+
+  accountsToRender.forEach((acc, index) => {
     const accKey = `${acc.pic}_${acc.cs}_${acc.akun}`;
     if (!hourlyDataStore[accKey]) {
-      hourlyDataStore[accKey] = { 11: '', 12: '', 13: '', 14: '', 15: '', 16: '', 17: '', 18: '' };
+      hourlyDataStore[accKey] = { '11':'', '12':'', '13':'', '14':'', '15':'', '16':'', '17':'', '18':'' };
     }
 
-    let tr = document.createElement('tr');
-    tr.className = 'hover:bg-amber-50/40 transition-colors';
-
-    let cellsHtml = `
-      <td class="p-2.5 border border-slate-200 font-black text-slate-800">${acc.pic}</td>
-      <td class="p-2.5 border border-slate-200 font-bold text-slate-700">${acc.cs}</td>
-      <td class="p-2.5 border border-slate-200 text-slate-800">${acc.akun}</td>
-      <td class="p-2.5 border border-slate-200 text-slate-600">${acc.dept}</td>
-    `;
-
     let rowTotal = 0;
-    TIME_SLOTS.forEach(hour => {
+    let hourInputs = '';
+
+    hours.forEach(hour => {
       const val = hourlyDataStore[accKey][hour] || '';
       rowTotal += Number(val) || 0;
-      cellsHtml += `
+      hourInputs += `
         <td class="p-1 border border-slate-200 text-center">
-          <input type="text" 
+          <input type="number" 
             data-key="${accKey}" 
             data-hour="${hour}"
+            data-cs="${acc.cs}"
+            data-pic="${acc.pic}"
             value="${val}" 
-           oninput="updateMatrixCell(this)"
-                  onchange="updateMatrixCell(this)"
+            oninput="updateMatrixCell(this)"
+            onchange="updateMatrixCell(this)"
             placeholder="0"
-            class="w-11 text-center py-1 text-xs border border-slate-200 rounded font-semibold focus:border-amber-500 focus:bg-amber-50 focus:outline-none">
+            class="w-10 text-center py-1 text-xs border border-slate-200 rounded font-bold focus:border-amber-500 focus:bg-amber-50 focus:outline-none">
         </td>
       `;
     });
 
-    cellsHtml += `
-      <td class="p-2 border border-slate-200 text-center font-black bg-slate-50 text-slate-900" id="rowTot_${index}">
-        ${rowTotal}
-      </td>
+    htmlRows += `
+      <tr class="hover:bg-amber-50/50 transition-colors border-b border-slate-200 text-xs">
+        <td class="p-2 border border-slate-200 font-black text-slate-800">${acc.pic}</td>
+        <td class="p-2 border border-slate-200 font-bold text-slate-700">${acc.cs}</td>
+        <td class="p-2 border border-slate-200 text-slate-800 truncate max-w-[160px]">${acc.akun}</td>
+        <td class="p-2 border border-slate-200 text-slate-600 truncate max-w-[140px]">${acc.dept}</td>
+        ${hourInputs}
+        <td class="p-2 border border-slate-200 text-center font-black bg-slate-50 text-slate-900" id="rowTot_${index}">
+          ${rowTotal}
+        </td>
+      </tr>
     `;
-
-    tr.innerHTML = cellsHtml;
-    tbody.appendChild(tr);
   });
+
+  tbody.innerHTML = htmlRows;
+  calcMatrixTotals();
+}
+
+// Inisialisasi Tanggal & Event Filter PIC
+function initAnalyticMatrix() {
+  const dateInput = document.getElementById('analyticDate') || document.getElementById('dmFilterDate');
+  if (dateInput && !dateInput.value) {
+    dateInput.value = new Date().toISOString().split('T')[0];
+  }
+
+  const picEl = document.getElementById('dmFilterPic') || document.getElementById('analyticPicFilter');
+  if (picEl) {
+    picEl.onchange = () => {
+      renderAnalyticMatrixTable();
+      runHourlyDmAnalysis();
+    };
+  }
+
+  renderAnalyticMatrixTable();
+  populateAiTargetDropdown();
+  runHourlyDmAnalysis();
+}
+
+// Jalankan otomatis begitu file termuat
+setTimeout(initAnalyticMatrix, 100);
+setTimeout(initAnalyticMatrix, 500);
 
   calcMatrixTotals();
   if (window.lucide) lucide.createIcons();
