@@ -3178,26 +3178,29 @@ const TIME_SLOTS = ['11', '12', '13', '14', '15', '16', '17', '18'];
 let hourlyDataStore = {};
 
 function initAnalyticMatrix() {
-  const dateInput = document.getElementById('analyticDate');
+  const dateInput = document.getElementById('analyticDate') || document.getElementById('dmFilterDate');
   if (dateInput && !dateInput.value) {
     dateInput.value = new Date().toISOString().split('T')[0];
   }
-  renderCSTable();
-  syncAllAccountDropdowns();
+  if (typeof renderCSTable === 'function') renderCSTable();
+  if (typeof syncAllAccountDropdowns === 'function') syncAllAccountDropdowns();
+  
   renderAnalyticMatrixTable();
+  if (typeof populateAiTargetDropdown === 'function') populateAiTargetDropdown();
+  if (typeof runHourlyDmAnalysis === 'function') runHourlyDmAnalysis();
 }
 
 function renderAnalyticMatrixTable() {
-  const tbody = document.getElementById('analyticMatrixBody');
-  const picEl = document.getElementById('analyticPicFilter');
-  if (!tbody || !picEl) return;
+  const tbody = document.getElementById('analyticMatrixBody') || document.getElementById('dmMatrixBody');
+  const picEl = document.getElementById('analyticPicFilter') || document.getElementById('dmFilterPic');
+  if (!tbody) return;
 
-  const accounts = getMasterAccounts();
-  const filterPic = picEl.value;
+  const accounts = typeof getMasterAccounts === 'function' ? getMasterAccounts() : [];
+  const filterPic = picEl ? picEl.value : 'ALL';
   tbody.innerHTML = '';
-  
-  const filtered = filterPic === 'ALL' 
-    ? accounts 
+
+  const filtered = filterPic === 'ALL'
+    ? accounts
     : accounts.filter(a => a.pic === filterPic);
 
   filtered.forEach((acc, index) => {
