@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAVE IN DATA - Data Hub</title>
@@ -302,6 +303,100 @@
           </tr>
         </tfoot>
       </table>
+    </div>
+  </div>
+    <!-- MODUL ANALISIS RATE DM, GRAFIK & AI INSIGHT -->
+  <div class="mt-6 space-y-6">
+    <!-- Filter Bar Analisis -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-calm-200 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-black text-slate-800 uppercase tracking-wide">AI Performance & DM Rate Analytics</h3>
+          <p class="text-[11px] text-slate-500">Evaluasi performa lead masuk per jam dan rekomendasi strategi kampanye</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div>
+          <label class="block text-[10px] font-bold uppercase text-slate-400 mb-0.5">Analisis Subjek</label>
+          <select id="aiTargetFilter" onchange="runHourlyDmAnalysis()" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 bg-white shadow-xs">
+            <option value="ALL">Semua Tim (Global)</option>
+          </select>
+        </div>
+        <div class="pt-3.5">
+          <button type="button" onclick="runHourlyDmAnalysis()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Evaluasi Ulang
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ringkasan Metrik Cepat -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Lead Terpantau</span>
+        <h4 id="statTotalDm" class="text-2xl font-black text-slate-800 mt-1">0</h4>
+        <span class="text-[10px] text-slate-500">Lead masuk hari ini</span>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Rata-rata Rate / Jam</span>
+        <h4 id="statAvgRate" class="text-2xl font-black text-indigo-600 mt-1">0.0 <span class="text-xs font-semibold text-slate-400">DM/jam</span></h4>
+        <span class="text-[10px] text-slate-500">Dihitung dari 8 slot jam aktif</span>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Jam Tersibuk (Peak)</span>
+        <h4 id="statPeakHour" class="text-2xl font-black text-emerald-600 mt-1">-</h4>
+        <span id="statPeakVal" class="text-[10px] text-slate-500">0 DM masuk</span>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Jam Paling Stagnan</span>
+        <h4 id="statLowestHour" class="text-2xl font-black text-rose-500 mt-1">-</h4>
+        <span id="statLowestVal" class="text-[10px] text-slate-500">0 DM masuk</span>
+      </div>
+    </div>
+
+    <!-- Grafik Visual & Rekomendasi AI -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-4 flex items-center gap-2">
+          <i data-lucide="bar-chart" class="w-4 h-4 text-slate-500"></i> Distribusi Aliran DM Masuk (11.00 - 18.00)
+        </h4>
+        <div class="relative h-64 w-full">
+          <canvas id="hourlyRateChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+              <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-600"></i> AI Smart Analysis & Recommendations
+            </h4>
+            <span id="aiBadgeStatus" class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-indigo-50 text-indigo-700">Analisis Siap</span>
+          </div>
+          
+          <div class="space-y-3">
+            <div>
+              <span class="text-[11px] font-bold text-slate-700 uppercase block mb-1">Evaluasi Performa:</span>
+              <p id="aiEvaluationText" class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                Data sedang dihitung. Silakan isi matriks jam di atas.
+              </p>
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-slate-700 uppercase block mb-1">Rekomendasi Tindakan:</span>
+              <div id="aiRecommendationList" class="space-y-1.5"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+          <span>Target Analisis: <b id="aiTargetLabel" class="text-slate-700">Global</b></span>
+          <span id="aiTimestamp" class="italic">-</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
