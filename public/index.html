@@ -3244,12 +3244,13 @@ function renderAnalyticMatrixTable() {
     accounts = DEFAULT_FALLBACK_ACCOUNTS;
   }
 
-  const filterPic = picEl ? picEl.value : 'ALL';
-  tbody.innerHTML = '';
+  const rawVal = picEl ? (picEl.value || '').trim().toUpperCase() : 'ALL';
+    const filterPic = (!rawVal || rawVal === 'ALL' || rawVal.includes('SEMUA')) ? 'ALL' : rawVal;
+    tbody.innerHTML = '';
 
-  const filtered = filterPic === 'ALL'
-    ? accounts
-    : accounts.filter(a => a.pic === filterPic);
+    const filtered = (filterPic === 'ALL')
+      ? accounts
+      : accounts.filter(a => a.pic && a.pic.toUpperCase() === filterPic);
 
   filtered.forEach((acc, index) => {
     const accKey = `${acc.pic}_${acc.cs}_${acc.akun}`;
