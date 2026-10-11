@@ -3226,7 +3226,8 @@ function renderAnalyticMatrixTable() {
             data-key="${accKey}" 
             data-hour="${hour}"
             value="${val}" 
-            onchange="updateMatrixCell(this)"
+           oninput="updateMatrixCell(this)"
+                  onchange="updateMatrixCell(this)"
             placeholder="0"
             class="w-11 text-center py-1 text-xs border border-slate-200 rounded font-semibold focus:border-amber-500 focus:bg-amber-50 focus:outline-none">
         </td>
@@ -3246,13 +3247,14 @@ function renderAnalyticMatrixTable() {
   calcMatrixTotals();
   if (window.lucide) lucide.createIcons();
 }
-
 function updateMatrixCell(input) {
   const key = input.dataset.key;
   const hour = input.dataset.hour;
   if (!hourlyDataStore[key]) hourlyDataStore[key] = {};
   hourlyDataStore[key][hour] = input.value;
   calcMatrixTotals();
+  runHourlyDmAnalysis();
+}
 }
 
 function calcMatrixTotals() {
@@ -3330,25 +3332,33 @@ function populateAiTargetDropdown() {
 }
 
 function runHourlyDmAnalysis() {
-  populateAiTargetDropdown();
-
   const select = document.getElementById('aiTargetFilter');
   const target = select ? select.value : 'ALL';
-  const accounts = typeof getMasterAccounts === 'function' ? getMasterAccounts() : [];
   const hours = ['11', '12', '13', '14', '15', '16', '17', '18'];
   
   let hourlyCounts = { '11': 0, '12': 0, '13': 0, '14': 0, '15': 0, '16': 0, '17': 0, '18': 0 };
   let targetAccountsCount = 0;
 
-  accounts.forEach(acc => {
-    if (target !== 'ALL' && acc.cs !== target) return;
+  const tableRows = document.querySelectorAll('#analyticMatrixBody tr');
+  
+  tableRows.forEach(row => {
+    const csCell = row.children[1];
+    if (!csCell) return;
+    const rowCs = csCell.innerText.trim();
+
+    if (target !== 'ALL' && rowCs.toUpperCase() !== target.toUpperCase()) {
+      return;
+    }
+
     targetAccountsCount++;
 
-    const accKey = `${acc.pic}_${acc.cs}_${acc.akun}`;
-    const rowData = (typeof hourlyDataStore !== 'undefined' && hourlyDataStore[accKey]) ? hourlyDataStore[accKey] : {};
-
-    hours.forEach(h => {
-      hourlyCounts[h] += Number(rowData[h]) || 0;
+    const inputs = row.querySelectorAll('input[data-hour]');
+    inputs.forEach(inp => {
+      const h = inp.dataset.hour;
+      const val = Number(inp.value) || 0;
+      if (hourlyCounts[h] !== undefined) {
+        hourlyCounts[h] += val;
+      }
     });
   });
 
